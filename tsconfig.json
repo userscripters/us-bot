@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noUncheckedIndexedAccess": true,
+        "removeComments": true,
+        "strictNullChecks": true,
+        "esModuleInterop": true,
+        "module": "es2020",
+        "target": "es2020",
+        "outDir": "dist",
+        "types": ["node"],
+        "lib": ["ESNext"]
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "test"]
+}
