@@ -4,6 +4,7 @@
   "description": "UserScripters chatroom bot",
   "main": "index.js",
   "scripts": {
+    "typecheck": "tsc --noEmit",
     "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha -r ts-node/register",
     "start:dev": "ts-node src/index.ts",
     "start": "node dist/index.js"
