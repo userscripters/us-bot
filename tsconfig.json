@@ -8,7 +8,7 @@
         "strictNullChecks": true,
         "esModuleInterop": true,
         "moduleResolution": "node",
-        "module": "es2020",
+        "module": "esnext",
         "target": "es2020",
         "outDir": "dist",
         "types": ["node"],
