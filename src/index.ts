@@ -10,7 +10,9 @@ type JoinStatus = {
     error?: unknown;
 };
 
-type ResponseRule = [matcher: RegExp, builder: (c: BotConfig) => string];
+type ResponseBuilder = (c: BotConfig, t: string) => string | Promise<string>;
+
+type ResponseRule = [matcher: RegExp, builder: ResponseBuilder];
 
 dotenv.config();
 
@@ -36,20 +38,21 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const rules: ResponseRule[] = [[/ping/, () => "pong"]];
 
-            const res = rules.reduce(
-                (a, [r, b]) => (r.test(text) ? b(config) : a),
-                ""
+            const builder = rules.reduce(
+                (a, [r, b]) => (r.test(text) ? b : a),
+                (() => "") as ResponseBuilder
             );
 
-            if (!res) return;
+            const response = await builder(config, text);
+            if (!response) return;
 
             console.debug(`
             From:     ${msg.userId}
             Name:     ${msg.userName}
-            Response: ${res}
+            Response: ${response}
             `);
 
-            queue.add(() => room.sendMessage(res));
+            queue.add(() => room.sendMessage(response));
         });
 
         await room.watch();
