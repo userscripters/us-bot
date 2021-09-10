@@ -3,7 +3,7 @@ import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import Queue from "p-queue";
 import { BotConfig } from "./config.js";
-import { sayWhoWeAre } from "./messages.js";
+import { sayWhoAreOurMemebers, sayWhoWeAre } from "./messages.js";
 
 type JoinStatus = {
     id: string;
@@ -40,6 +40,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             const rules: ResponseRule[] = [
                 [/ping/, () => "pong"],
                 [/who are we/, sayWhoWeAre],
+                [/who are( the|our)?( organi[sz]ation)? members/, sayWhoAreOurMemebers],
             ];
 
             const builder = rules.reduce(
