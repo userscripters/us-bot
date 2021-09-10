@@ -54,6 +54,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                     /what (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? packages?/,
                     sayWhatAreOurPackages,
                 ],
+                [/add-idea\s+.+/, addUserscriptIdea],
             ];
 
             const builder = rules.reduce(
