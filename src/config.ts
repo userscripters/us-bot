@@ -6,14 +6,30 @@ export class BotConfig extends EventEmitter {
 
     public logLevel = "default";
 
+    public throttles: Map<string, number> = new Map();
+
     #email: string;
     #password: string;
 
-    constructor({ ROOM_IDS, EMAIL = "", PASSWORD = "" }: NodeJS.ProcessEnv) {
+    constructor({
+        ROOM_IDS,
+        EMAIL = "",
+        PASSWORD = "",
+        THROTTLES = "{}",
+    }: NodeJS.ProcessEnv) {
         super();
         this.roomIds.push(...splitENV(ROOM_IDS));
         this.#email = EMAIL;
         this.#password = PASSWORD;
+
+        Object.entries(THROTTLES).forEach(([id, throttle]) => {
+            this.throttles.set(id, +throttle);
+        });
+    }
+
+    getThrottle(id: string) {
+        const seconds = this.throttles.get(id) || 1;
+        return seconds * 1e3;
     }
 
     getCredentials(): [email: string, pwd: string] {
