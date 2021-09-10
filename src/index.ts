@@ -1,7 +1,9 @@
 import Client from "chatexchange";
 import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
+import entities from "html-entities";
 import Queue from "p-queue";
+import { addUserscriptIdea } from "./commands.js";
 import { BotConfig } from "./config.js";
 import {
     sayWhatAreOurPackages,
@@ -39,7 +41,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         const queue = new Queue({ interval: config.getThrottle(id) });
 
         room.on("message", async (msg: WebSocketEvent) => {
-            const text = await msg.content;
+            const text = entities.decode(await msg.content);
 
             const rules: ResponseRule[] = [
                 [/ping/, () => "pong"],
