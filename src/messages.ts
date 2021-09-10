@@ -1,5 +1,5 @@
 import { BotConfig } from "./config.js";
-import { mdLink } from "./helpers.js";
+import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
 
 /**
@@ -36,4 +36,26 @@ export const sayWhoAreOurMemebers = async ({ org }: BotConfig) => {
     const data = await Promise.all(info);
     const memberList = data.filter(Boolean).join(", ");
     return `Our members: ${memberList}`;
+};
+
+/**
+ * @summary says what the UserScripters packages are
+ */
+export const sayWhatAreOurPackages = async ({ org }: BotConfig) => {
+    const res = await oktokit.rest.packages.listPackagesForOrganization({
+        org,
+        package_type: "npm",
+        visibility: "public",
+    });
+
+    const packages = res.data;
+    const { length } = packages;
+
+    const packs = pluralize(length, "package");
+
+    const packageLinks = packages.map(({ html_url, name }) =>
+        mdLink(html_url, name)
+    );
+
+    return `We published ${packs}: ${listify(...packageLinks)}`;
 };
