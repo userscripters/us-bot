@@ -10,6 +10,8 @@ type JoinStatus = {
     error?: unknown;
 };
 
+type ResponseRule = [matcher: RegExp, builder: (c: BotConfig) => string];
+
 dotenv.config();
 
 const config = new BotConfig(process.env);
@@ -30,13 +32,24 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         const queue = new Queue({ interval: config.getThrottle(id) });
 
         room.on("message", async (msg: WebSocketEvent) => {
-            console.log(msg);
+            const text = await msg.content;
 
-            const response = "pong";
+            const rules: ResponseRule[] = [[/ping/, () => "pong"]];
 
-            if ((await msg.content) === "ping") {
-                queue.add(() => room.sendMessage(response));
-            }
+            const res = rules.reduce(
+                (a, [r, b]) => (r.test(text) ? b(config) : a),
+                ""
+            );
+
+            if (!res) return;
+
+            console.debug(`
+            From:     ${msg.userId}
+            Name:     ${msg.userName}
+            Response: ${res}
+            `);
+
+            queue.add(() => room.sendMessage(res));
         });
 
         await room.watch();
