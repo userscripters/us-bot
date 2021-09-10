@@ -8,6 +8,8 @@ export class BotConfig extends EventEmitter {
 
     public throttles: Map<string, number> = new Map();
 
+    public org: string;
+
     #email: string;
     #password: string;
 
@@ -16,11 +18,13 @@ export class BotConfig extends EventEmitter {
         EMAIL = "",
         PASSWORD = "",
         THROTTLES = "{}",
+        ORG_NAME,
     }: NodeJS.ProcessEnv) {
         super();
         this.roomIds.push(...splitENV(ROOM_IDS));
         this.#email = EMAIL;
         this.#password = PASSWORD;
+        this.org = ORG_NAME!;
 
         const parsed: Record<string, string> = JSON.parse(THROTTLES);
         Object.entries(parsed).forEach(([id, throttle]) => {
