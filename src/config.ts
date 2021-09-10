@@ -22,7 +22,8 @@ export class BotConfig extends EventEmitter {
         this.#email = EMAIL;
         this.#password = PASSWORD;
 
-        Object.entries(THROTTLES).forEach(([id, throttle]) => {
+        const parsed: Record<string, string> = JSON.parse(THROTTLES);
+        Object.entries(parsed).forEach(([id, throttle]) => {
             this.throttles.set(id, +throttle);
         });
     }
@@ -34,5 +35,17 @@ export class BotConfig extends EventEmitter {
 
     getCredentials(): [email: string, pwd: string] {
         return [this.#email, this.#password];
+    }
+
+    debug() {
+        const { roomIds, throttles } = this;
+        console.debug(`
+Bot Config:
+Email: ${this.#email}
+Rooms: ${roomIds.join(", ")}
+
+Throttles:
+${[...throttles].map(([k, v]) => `${k} - ${v}s`).join("\n")}
+`);
     }
 }
