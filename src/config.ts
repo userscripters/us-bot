@@ -11,11 +11,14 @@ export class BotConfig extends EventEmitter {
 
     public org: string;
 
+    public host: string;
+
     #email: string;
     #password: string;
     #admins: Set<number> = new Set();
 
     constructor({
+        HOST = "",
         ADMIN_IDS,
         ROOM_IDS,
         EMAIL = "",
@@ -28,6 +31,7 @@ export class BotConfig extends EventEmitter {
         this.#email = EMAIL;
         this.#password = PASSWORD;
         this.org = ORG_NAME!;
+        this.host = HOST;
 
         splitENV(ADMIN_IDS).forEach((id) => this.#admins.add(+id));
 
@@ -40,6 +44,11 @@ export class BotConfig extends EventEmitter {
     isAdmin(idOrUser: number | User) {
         const uid = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
         return this.#admins.has(uid);
+    }
+
+    isOnHeroku() {
+        const { host } = this;
+        return host.includes("herokuapp.com");
     }
 
     getThrottle(id: string) {
