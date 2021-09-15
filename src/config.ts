@@ -1,3 +1,4 @@
+import User from "chatexchange/dist/User";
 import EventEmitter from "events";
 import { splitENV } from "./helpers.js";
 
@@ -12,8 +13,10 @@ export class BotConfig extends EventEmitter {
 
     #email: string;
     #password: string;
+    #admins: Set<number> = new Set();
 
     constructor({
+        ADMIN_IDS,
         ROOM_IDS,
         EMAIL = "",
         PASSWORD = "",
@@ -26,10 +29,17 @@ export class BotConfig extends EventEmitter {
         this.#password = PASSWORD;
         this.org = ORG_NAME!;
 
+        splitENV(ADMIN_IDS).forEach((id) => this.#admins.add(+id));
+
         const parsed: Record<string, string> = JSON.parse(THROTTLES);
         Object.entries(parsed).forEach(([id, throttle]) => {
             this.throttles.set(id, +throttle);
         });
+    }
+
+    isAdmin(idOrUser: number | User) {
+        const uid = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
+        return this.#admins.has(uid);
     }
 
     getThrottle(id: string) {
