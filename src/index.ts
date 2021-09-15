@@ -41,6 +41,9 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         const queue = new Queue({ interval: config.getThrottle(id) });
 
         room.on("message", async (msg: WebSocketEvent) => {
+            if (!config.isAdmin(msg.userId))
+                return console.log(`non-admin msg:\n${JSON.stringify(msg)}`);
+
             const text = entities.decode(await msg.content);
 
             const rules: ResponseRule[] = [
