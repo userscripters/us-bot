@@ -1,5 +1,10 @@
 import express, { Application } from "express";
 import { Server } from "http";
+import { request } from "https";
+import { URL } from "url";
+import { promisify } from "util";
+
+const asyncRequest = promisify(request);
 
 /**
  * @summary starts the bot server
@@ -43,4 +48,13 @@ export const startServer = async (): Promise<Application> => {
     /** @see https://stackoverflow.com/a/14516195/11407695 */
     process.on("SIGINT", farewell);
     return app;
+};
+
+/**
+ * @summary adds a Heroku keep-alive interval
+ * @param url application URL
+ * @param mins minutes to wait between keep-alives
+ */
+export const herokuKeepAlive = (url: string, mins = 20) => {
+    setInterval(async () => await asyncRequest(new URL(url)), mins * 6e4);
 };
