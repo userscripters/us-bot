@@ -79,6 +79,9 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
         await room.watch();
 
+        // Interval to keep-alive
+        setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
+
         return { id, status: true };
     } catch (error) {
         return { id, status: false, error };
