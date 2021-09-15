@@ -10,7 +10,7 @@ import {
     sayWhoAreOurMemebers,
     sayWhoWeAre,
 } from "./messages.js";
-import { startServer } from "./server.js";
+import { herokuKeepAlive, startServer } from "./server.js";
 
 type JoinStatus = {
     id: string;
@@ -84,6 +84,8 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
 
         await startServer();
+
+        if (config.isOnHeroku()) herokuKeepAlive(config.host);
 
         return { id, status: true };
     } catch (error) {
