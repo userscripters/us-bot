@@ -5,6 +5,7 @@ import Queue from "p-queue";
 import { addUserscriptIdea } from "./commands.js";
 import { BotConfig } from "./config.js";
 import { sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
+import { herokuKeepAlive, startServer } from "./server.js";
 dotenv.config();
 const config = new BotConfig(process.env);
 config.debug();
@@ -44,6 +45,10 @@ const roomJoins = roomIds.map(async (id) => {
             queue.add(() => room.sendMessage(response));
         });
         await room.watch();
+        setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
+        await startServer();
+        if (config.isOnHeroku())
+            herokuKeepAlive(config.host);
         return { id, status: true };
     }
     catch (error) {

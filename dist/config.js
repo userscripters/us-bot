@@ -13,7 +13,7 @@ var _BotConfig_email, _BotConfig_password, _BotConfig_admins;
 import EventEmitter from "events";
 import { splitENV } from "./helpers.js";
 export class BotConfig extends EventEmitter {
-    constructor({ ADMIN_IDS, ROOM_IDS, EMAIL = "", PASSWORD = "", THROTTLES = "{}", ORG_NAME, }) {
+    constructor({ HOST = "", ADMIN_IDS, ROOM_IDS, EMAIL = "", PASSWORD = "", THROTTLES = "{}", ORG_NAME, }) {
         super();
         this.roomIds = [];
         this.logLevel = "default";
@@ -25,6 +25,7 @@ export class BotConfig extends EventEmitter {
         __classPrivateFieldSet(this, _BotConfig_email, EMAIL, "f");
         __classPrivateFieldSet(this, _BotConfig_password, PASSWORD, "f");
         this.org = ORG_NAME;
+        this.host = HOST;
         splitENV(ADMIN_IDS).forEach((id) => __classPrivateFieldGet(this, _BotConfig_admins, "f").add(+id));
         const parsed = JSON.parse(THROTTLES);
         Object.entries(parsed).forEach(([id, throttle]) => {
@@ -34,6 +35,10 @@ export class BotConfig extends EventEmitter {
     isAdmin(idOrUser) {
         const uid = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
         return __classPrivateFieldGet(this, _BotConfig_admins, "f").has(uid);
+    }
+    isOnHeroku() {
+        const { host } = this;
+        return host.includes("herokuapp.com");
     }
     getThrottle(id) {
         const seconds = this.throttles.get(id) || 1;
