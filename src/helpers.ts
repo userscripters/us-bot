@@ -24,3 +24,12 @@ export const listify = (...items: string[]) =>
     items.length > 2
         ? `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`
         : items.join(", ");
+
+/**
+ * @summary splits text arguments to pass into command manager
+ */
+export const splitArgs = (text: string) =>
+    text
+        .split(/(?<!"[\w ]+)\s+(?![\w ]+")/)
+        // removes extra quotes from arguments
+        .map((t) => t.replace(/^"(.+)"$/, "$1"));
