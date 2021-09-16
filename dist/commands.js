@@ -38,7 +38,7 @@ export const addUserscriptIdea = async ({ org }, text) => {
 export const addRepository = async ({ org }, text) => {
     const args = splitArgs(text);
     const parsed = createRepo.parse(args, { from: "user" });
-    console.log(parsed);
+    console.log(parsed.opts());
     const { private: p = false, template, name, description } = parsed.opts();
     const common = { private: p, name, description };
     if (template) {
@@ -46,6 +46,7 @@ export const addRepository = async ({ org }, text) => {
             ...common,
             template_owner: org,
             template_repo: template,
+            owner: org,
         });
         return sayCreatedRepo(res.data, true);
     }

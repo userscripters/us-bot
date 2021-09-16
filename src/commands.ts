@@ -57,7 +57,7 @@ export const addRepository = async ({ org }: BotConfig, text: string) => {
 
     const parsed = createRepo.parse(args, { from: "user" });
 
-    console.log(parsed);
+    console.log(parsed.opts());
 
     const { private: p = false, template, name, description } = parsed.opts();
 
@@ -68,6 +68,7 @@ export const addRepository = async ({ org }: BotConfig, text: string) => {
             ...common,
             template_owner: org,
             template_repo: template,
+            owner: org,
         });
 
         return sayCreatedRepo(res.data, true);
