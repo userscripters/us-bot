@@ -33,3 +33,8 @@ export const splitArgs = (text: string) =>
         .split(/(?<!"[\w ]+)\s+(?![\w ]+")/)
         // removes extra quotes from arguments
         .map((t) => t.replace(/^"(.+)"$/, "$1"));
+
+/**
+ * @summary sleeps for a specified number of seconds
+ */
+export const sleep = (sec = 1) => new Promise((r) => setTimeout(r, sec * 1e3));
