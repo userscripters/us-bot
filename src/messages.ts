@@ -59,3 +59,23 @@ export const sayWhatAreOurPackages = async ({ org }: BotConfig) => {
 
     return `We published ${packs}: ${listify(...packageLinks)}`;
 };
+
+/**
+ * @summary says that a repository is successfully created
+ */
+export const sayCreatedRepo = (
+    {
+        html_url,
+        private: p,
+        name,
+    }: { html_url: string; private: boolean; name: string },
+    fromTemplate = false
+) => {
+    const pvt = p ? " private" : "";
+    const tpl = fromTemplate ? " templated" : "";
+
+    return `Created a${tpl}${pvt} ${mdLink(
+        html_url,
+        "repository"
+    )} for ${name}`;
+};
