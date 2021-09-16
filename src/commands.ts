@@ -7,9 +7,10 @@ import oktokit from "./userscripters.js";
 const addIdea = new Command("add-idea");
 addIdea
     .requiredOption("-c, --column <id>", "Column id")
+    .requiredOption("-s, --summary <text>", "Idea summary")
     .option("-o, --repository <link>", "Repository if exists")
     .option("-r, --reference <link>", "Inspiration reference")
-    .option("-s, --summary <text>", "Idea summary");
+
 
 const createRepo = new Command("create-repo");
 createRepo
