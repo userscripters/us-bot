@@ -65,8 +65,8 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                     /what (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? packages?/,
                     sayWhatAreOurPackages,
                 ],
-                [/add-idea\s+.+/, addUserscriptIdea],
-                [/(?:create|add) repo(?:sitory)?/, addRepository],
+                [/(?:create|add|new) idea\s+.+/, addUserscriptIdea],
+                [/(?:create|add|new) repo(?:sitory)?/, addRepository],
             ];
 
             const builder = rules.reduce(
@@ -78,7 +78,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             if (!response) return;
 
             console.debug(`
-            From:     ${msg.userId}
+            From:     ${userId}
             Name:     ${msg.userName}
             Response: ${response}
             `);
