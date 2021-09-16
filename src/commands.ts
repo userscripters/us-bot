@@ -57,9 +57,11 @@ export const addRepository = async ({ org }: BotConfig, text: string) => {
 
     const parsed = createRepo.parse(args, { from: "user" });
 
-    const { p = false, template, n, description } = parsed.opts();
+    console.log(parsed);
 
-    const common = { private: p, name: n, description };
+    const { private: p = false, template, name, description } = parsed.opts();
+
+    const common = { private: p, name, description };
 
     if (template) {
         const res = await oktokit.rest.repos.createUsingTemplate({

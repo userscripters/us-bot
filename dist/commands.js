@@ -38,8 +38,9 @@ export const addUserscriptIdea = async ({ org }, text) => {
 export const addRepository = async ({ org }, text) => {
     const args = splitArgs(text);
     const parsed = createRepo.parse(args, { from: "user" });
-    const { p = false, template, n, description } = parsed.opts();
-    const common = { private: p, name: n, description };
+    console.log(parsed);
+    const { private: p = false, template, name, description } = parsed.opts();
+    const common = { private: p, name, description };
     if (template) {
         const res = await oktokit.rest.repos.createUsingTemplate({
             ...common,
