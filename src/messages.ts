@@ -3,6 +3,21 @@ import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
 
 /**
+ * @summary has a little fun
+ */
+export const sayPingPong = (_config: BotConfig, text: string) => {
+    const responses: [RegExp, string][] = [
+        [/pong/i, "ping"],
+        [/ping/i, "pong"],
+    ];
+
+    return responses.reduce(
+        (a, [regex, r]) => (regex.test(text) ? `${a} ${r}` : a),
+        ""
+    );
+};
+
+/**
  * @summary says who UserScripters are
  */
 export const sayWhoWeAre = async ({ org }: BotConfig) => {

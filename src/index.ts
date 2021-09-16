@@ -6,6 +6,7 @@ import Queue from "p-queue";
 import { addRepository, addUserscriptIdea } from "./commands.js";
 import { BotConfig } from "./config.js";
 import {
+    sayPingPong,
     sayWhatAreOurPackages,
     sayWhoAreOurMemebers,
     sayWhoWeAre,
@@ -48,7 +49,6 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             const text = entities.decode(await msg.content);
 
             const rules: ResponseRule[] = [
-                [/ping/, () => "pong"],
                 [/who are we/, sayWhoWeAre],
                 [
                     /who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? members?/,
@@ -64,7 +64,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const builder = rules.reduce(
                 (a, [r, b]) => (r.test(text) ? b : a),
-                (() => "") as ResponseBuilder
+                sayPingPong as ResponseBuilder
             );
 
             const response = await builder(config, text);

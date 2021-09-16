@@ -1,5 +1,12 @@
 import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
+export const sayPingPong = (_config, text) => {
+    const responses = [
+        [/pong/i, "ping"],
+        [/ping/i, "pong"],
+    ];
+    return responses.reduce((a, [regex, r]) => (regex.test(text) ? `${a} ${r}` : a), "");
+};
 export const sayWhoWeAre = async ({ org }) => {
     const res = await oktokit.rest.orgs.get({ org });
     const { name, description } = res.data;

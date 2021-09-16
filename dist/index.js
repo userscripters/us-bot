@@ -4,7 +4,7 @@ import entities from "html-entities";
 import Queue from "p-queue";
 import { addRepository, addUserscriptIdea } from "./commands.js";
 import { BotConfig } from "./config.js";
-import { sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
+import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 dotenv.config();
 const config = new BotConfig(process.env);
@@ -21,7 +21,6 @@ const roomJoins = roomIds.map(async (id) => {
                 return console.log(`non-admin msg:\n${JSON.stringify(msg)}`);
             const text = entities.decode(await msg.content);
             const rules = [
-                [/ping/, () => "pong"],
                 [/who are we/, sayWhoWeAre],
                 [
                     /who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? members?/,
@@ -34,7 +33,7 @@ const roomJoins = roomIds.map(async (id) => {
                 [/add-idea\s+.+/, addUserscriptIdea],
                 [/(?:create|add) repo(?:sitory)?/, addRepository],
             ];
-            const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
+            const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), sayPingPong);
             const response = await builder(config, text);
             if (!response)
                 return;
