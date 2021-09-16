@@ -8,3 +8,6 @@ export const pluralize = (num, text, suffix = "s") => {
 export const listify = (...items) => items.length > 2
     ? `${items.slice(0, -1).join(", ")}, and ${items[items.length - 1]}`
     : items.join(", ");
+export const splitArgs = (text) => text
+    .split(/(?<!"[\w ]+)\s+(?![\w ]+")/)
+    .map((t) => t.replace(/^"(.+)"$/, "$1"));

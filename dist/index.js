@@ -2,7 +2,7 @@ import Client from "chatexchange";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { addUserscriptIdea } from "./commands.js";
+import { addRepository, addUserscriptIdea } from "./commands.js";
 import { BotConfig } from "./config.js";
 import { sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
@@ -32,6 +32,7 @@ const roomJoins = roomIds.map(async (id) => {
                     sayWhatAreOurPackages,
                 ],
                 [/add-idea\s+.+/, addUserscriptIdea],
+                [/(?:create|add) repo(?:sitory)?/, addRepository],
             ];
             const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
             const response = await builder(config, text);

@@ -36,3 +36,8 @@ export const sayWhatAreOurPackages = async ({ org }) => {
     const packageLinks = packages.map(({ html_url, name }) => mdLink(html_url, name));
     return `We published ${packs}: ${listify(...packageLinks)}`;
 };
+export const sayCreatedRepo = ({ html_url, private: p, name, }, fromTemplate = false) => {
+    const pvt = p ? " private" : "";
+    const tpl = fromTemplate ? " templated" : "";
+    return `Created a${tpl}${pvt} ${mdLink(html_url, "repository")} for ${name}`;
+};
