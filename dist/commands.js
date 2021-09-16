@@ -1,13 +1,13 @@
 import { Command } from "commander";
-import { mdLink, splitArgs } from "./helpers.js";
+import { listify, mdLink, splitArgs } from "./helpers.js";
 import { sayCreatedRepo } from "./messages.js";
 import oktokit from "./userscripters.js";
 const addIdea = new Command("add-idea");
 addIdea
     .requiredOption("-c, --column <id>", "Column id")
+    .requiredOption("-s, --summary <text>", "Idea summary")
     .option("-o, --repository <link>", "Repository if exists")
-    .option("-r, --reference <link>", "Inspiration reference")
-    .option("-s, --summary <text>", "Idea summary");
+    .option("-r, --reference <link>", "Inspiration reference");
 const createRepo = new Command("create-repo");
 createRepo
     .requiredOption("-n --name <name>", "Project name")
@@ -38,7 +38,6 @@ export const addUserscriptIdea = async ({ org }, text) => {
 export const addRepository = async ({ org }, text) => {
     const args = splitArgs(text);
     const parsed = createRepo.parse(args, { from: "user" });
-    console.log(parsed.opts());
     const { private: p = false, template, name, description } = parsed.opts();
     const common = { private: p, name, description };
     if (template) {
@@ -52,4 +51,9 @@ export const addRepository = async ({ org }, text) => {
     }
     const res = await oktokit.rest.repos.createInOrg({ ...common, org });
     return sayCreatedRepo(res.data);
+};
+export const listProjects = async ({ org }) => {
+    const res = await oktokit.rest.projects.listForOrg({ org });
+    const projects = res.data;
+    return `Our projects: ${listify(...projects.map(({ html_url, name }) => mdLink(html_url, name)))}`;
 };

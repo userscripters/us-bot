@@ -2,7 +2,7 @@ import Client from "chatexchange";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { addRepository, addUserscriptIdea } from "./commands.js";
+import { addRepository, addUserscriptIdea, listProjects } from "./commands.js";
 import { BotConfig } from "./config.js";
 import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
@@ -36,15 +36,19 @@ const roomJoins = roomIds.map(async (id) => {
                     /what (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? packages?/,
                     sayWhatAreOurPackages,
                 ],
-                [/add-idea\s+.+/, addUserscriptIdea],
-                [/(?:create|add) repo(?:sitory)?/, addRepository],
+                [/(?:create|add|new) idea\s+.+/, addUserscriptIdea],
+                [/(?:create|add|new) repo(?:sitory)?/, addRepository],
+                [
+                    /(?:list|our|show|display)(?: our|orgs?)? projects?/,
+                    listProjects,
+                ],
             ];
-            const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), sayPingPong);
+            const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
             const response = await builder(config, text);
             if (!response)
                 return;
             console.debug(`
-            From:     ${msg.userId}
+            From:     ${userId}
             Name:     ${msg.userName}
             Response: ${response}
             `);
