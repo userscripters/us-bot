@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { BotConfig } from "./config.js";
-import { mdLink } from "./helpers.js";
+import { mdLink, splitArgs } from "./helpers.js";
+import { sayCreatedRepo } from "./messages.js";
 import oktokit from "./userscripters.js";
 
 const addIdea = new Command("add-idea");
@@ -10,14 +11,18 @@ addIdea
     .option("-r, --reference <link>", "Inspiration reference")
     .option("-s, --summary <text>", "Idea summary");
 
+const createRepo = new Command("create-repo");
+createRepo
+    .requiredOption("-n --name <name>", "Project name")
+    .requiredOption("-d, --description <text>", "Project description")
+    .option("-t, --template <template>", "Project template")
+    .option("-p, --private", "Visibility");
+
 /**
  * @summary adds an idea to the Userscripts project
  */
 export const addUserscriptIdea = async ({ org }: BotConfig, text: string) => {
-    const args = text
-        .split(/(?<!"[\w ]+)\s+(?![\w ]+")/)
-        // removes extra quotes from arguments
-        .map((t) => t.replace(/^"(.+)"$/, "$1"));
+    const args = splitArgs(text);
 
     const parsed = addIdea.parse(args, { from: "user" });
 
@@ -42,4 +47,31 @@ export const addUserscriptIdea = async ({ org }: BotConfig, text: string) => {
 
     const html_url = `https://github.com/orgs/${org}/projects/${number}#card-${id}`;
     return `Successfully ${mdLink(html_url, "created an idea")}`;
+};
+
+/**
+ * @summary adds a repository to organisation project
+ */
+export const addRepository = async ({ org }: BotConfig, text: string) => {
+    const args = splitArgs(text);
+
+    const parsed = createRepo.parse(args, { from: "user" });
+
+    const { p = false, template, n, description } = parsed.opts();
+
+    const common = { private: p, name: n, description };
+
+    if (template) {
+        const res = await oktokit.rest.repos.createUsingTemplate({
+            ...common,
+            template_owner: org,
+            template_repo: template,
+        });
+
+        return sayCreatedRepo(res.data, true);
+    }
+
+    const res = await oktokit.rest.repos.createInOrg({ ...common, org });
+
+    return sayCreatedRepo(res.data);
 };
