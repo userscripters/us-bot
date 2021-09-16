@@ -36,6 +36,8 @@ await client.login(...config.getCredentials());
 
 const { roomIds } = config;
 
+const bot = await client.getMe();
+
 const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
     try {
         const room = await client.joinRoom(+id);
@@ -45,7 +47,9 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         room.on("message", async (msg: WebSocketEvent) => {
             const text = entities.decode(await msg.content);
 
-            if (!config.isAdmin(msg.userId)) {
+            const { userId } = msg;
+
+            if (!config.isAdmin(userId) && bot.id !== userId) {
                 const pingpong = sayPingPong(config, text);
                 if (pingpong) room.sendMessage(pingpong);
                 return;
@@ -67,7 +71,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const builder = rules.reduce(
                 (a, [r, b]) => (r.test(text) ? b : a),
-                sayPingPong as ResponseBuilder
+                (() => "") as ResponseBuilder
             );
 
             const response = await builder(config, text);

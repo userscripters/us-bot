@@ -11,3 +11,4 @@ export const listify = (...items) => items.length > 2
 export const splitArgs = (text) => text
     .split(/(?<!"[\w ]+)\s+(?![\w ]+")/)
     .map((t) => t.replace(/^"(.+)"$/, "$1"));
+export const sleep = (sec = 1) => new Promise((r) => setTimeout(r, sec * 1e3));

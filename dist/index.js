@@ -12,13 +12,15 @@ config.debug();
 const client = new Client.default("stackoverflow.com");
 await client.login(...config.getCredentials());
 const { roomIds } = config;
+const bot = await client.getMe();
 const roomJoins = roomIds.map(async (id) => {
     try {
         const room = await client.joinRoom(+id);
         const queue = new Queue({ interval: config.getThrottle(id) });
         room.on("message", async (msg) => {
             const text = entities.decode(await msg.content);
-            if (!config.isAdmin(msg.userId)) {
+            const { userId } = msg;
+            if (!config.isAdmin(userId) && bot.id !== userId) {
                 const pingpong = sayPingPong(config, text);
                 if (pingpong)
                     room.sendMessage(pingpong);
