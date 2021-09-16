@@ -43,10 +43,13 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         const queue = new Queue({ interval: config.getThrottle(id) });
 
         room.on("message", async (msg: WebSocketEvent) => {
-            if (!config.isAdmin(msg.userId))
-                return console.log(`non-admin msg:\n${JSON.stringify(msg)}`);
-
             const text = entities.decode(await msg.content);
+
+            if (!config.isAdmin(msg.userId)) {
+                const pingpong = sayPingPong(config, text);
+                if (pingpong) room.sendMessage(pingpong);
+                return;
+            }
 
             const rules: ResponseRule[] = [
                 [/who are we/, sayWhoWeAre],
