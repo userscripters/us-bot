@@ -3,7 +3,7 @@ import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { addRepository, addUserscriptIdea } from "./commands.js";
+import { addRepository, addUserscriptIdea, listProjects } from "./commands.js";
 import { BotConfig } from "./config.js";
 import {
     sayPingPong,
@@ -67,6 +67,10 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 ],
                 [/(?:create|add|new) idea\s+.+/, addUserscriptIdea],
                 [/(?:create|add|new) repo(?:sitory)?/, addRepository],
+                [
+                    /(?:list|our|show|display)(?: our|orgs?)? projects?/,
+                    listProjects,
+                ],
             ];
 
             const builder = rules.reduce(
