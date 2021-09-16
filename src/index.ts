@@ -3,7 +3,7 @@ import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { addUserscriptIdea } from "./commands.js";
+import { addRepository, addUserscriptIdea } from "./commands.js";
 import { BotConfig } from "./config.js";
 import {
     sayWhatAreOurPackages,
@@ -59,6 +59,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                     sayWhatAreOurPackages,
                 ],
                 [/add-idea\s+.+/, addUserscriptIdea],
+                [/(?:create|add) repo(?:sitory)?/, addRepository],
             ];
 
             const builder = rules.reduce(
