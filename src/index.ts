@@ -1,4 +1,4 @@
-import Client from "chatexchange";
+import Client, { ChatEventType } from "chatexchange";
 import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import entities from "html-entities";
@@ -41,6 +41,13 @@ const bot = await client.getMe();
 const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
     try {
         const room = await client.joinRoom(+id);
+
+        room.ignore(
+            ChatEventType.USER_JOINED,
+            ChatEventType.USER_LEFT,
+            ChatEventType.ROOM_RENAMED,
+            ChatEventType.STARS_CHANGED
+        );
 
         const queue = new Queue({ interval: config.getThrottle(id) });
 
