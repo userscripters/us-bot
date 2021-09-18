@@ -65,7 +65,10 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                     /what (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? packages?/,
                     sayWhatAreOurPackages,
                 ],
-                [/(?:create|add|new) idea\s+.+/, addUserscriptIdea],
+                [
+                    /(?:create|add|new)(?: (?:user)?script)? idea\s+.+/,
+                    addUserscriptIdea,
+                ],
                 [/(?:create|add|new) repo(?:sitory)?/, addRepository],
                 [
                     /(?:list|our|show|display)(?: our|orgs?)? projects?/,
