@@ -89,3 +89,30 @@ export const listProjects = async ({ org }: BotConfig) => {
         ...projects.map(({ html_url, name }) => mdLink(html_url, name))
     )}`;
 };
+
+/**
+ * @summary lists a project columns
+ */
+export const listProjectColumns = async ({ org }: BotConfig, text: string) => {
+    const [, projectName = ""] =
+        /((?:\w+)|(?:"[\w\s]+?")) project/i.exec(text) || [];
+
+    const normalized = projectName?.toLowerCase().trim();
+
+    const prjRes = await oktokit.rest.projects.listForOrg({ org });
+
+    const ps = prjRes.data;
+
+    const project = ps.find(({ name }) => name.toLowerCase() === normalized);
+    if (!project) return "";
+
+    const { id, name } = project;
+
+    const colRes = await oktokit.rest.projects.listColumns({ project_id: id });
+
+    const columns = colRes.data;
+
+    return `"${name}" columns:\n${columns
+        .map(({ id, name }) => `- ${id} | ${name}`)
+        .join("\n")}`;
+};

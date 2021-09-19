@@ -2,7 +2,7 @@ import Client, { ChatEventType } from "chatexchange";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { addRepository, addUserscriptIdea, listProjects } from "./commands.js";
+import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, } from "./commands.js";
 import { BotConfig } from "./config.js";
 import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
@@ -45,6 +45,10 @@ const roomJoins = roomIds.map(async (id) => {
                 [
                     /(?:list|our|show|display)(?: our|orgs?)? projects?/,
                     listProjects,
+                ],
+                [
+                    /(?:list|show|display)(?: col(?:umn)?s (?:of|from))? ((?:\w+)|(?:"[\w\s]+?"))(?: project)?(?: col(?:umn)?s)?/,
+                    listProjectColumns,
                 ],
             ];
             const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
