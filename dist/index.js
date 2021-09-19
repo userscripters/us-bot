@@ -58,7 +58,7 @@ const roomJoins = roomIds.map(async (id) => {
             `);
             const maxChars = 500;
             const messages = response
-                .split(new RegExp(`(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|$)`, "gm"))
+                .split(new RegExp(`(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|\\s|$)`, "gm"))
                 .filter(Boolean);
             for (const message of messages) {
                 queue.add(() => room.sendMessage(message));

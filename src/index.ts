@@ -101,7 +101,10 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const messages = response
                 .split(
-                    new RegExp(`(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|$)`, "gm")
+                    new RegExp(
+                        `(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|\\s|$)`,
+                        "gm"
+                    )
                 )
                 .filter(Boolean);
 
