@@ -1,5 +1,9 @@
 import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
+export const shootUser = (_config, text) => {
+    const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
+    return `@${userName} pew-pew!`;
+};
 export const sayPingPong = (_config, text) => {
     const responses = [
         [/pong/i, "ping"],

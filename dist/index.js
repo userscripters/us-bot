@@ -4,8 +4,8 @@ import entities from "html-entities";
 import Queue from "p-queue";
 import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, } from "./commands.js";
 import { BotConfig } from "./config.js";
-import { ADD_IDEA, ADD_REPO, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, WHO_WE_ARE, } from "./expressions.js";
-import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
+import { ADD_IDEA, ADD_REPO, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, WHO_WE_ARE, } from "./expressions.js";
+import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, shootUser, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 dotenv.config();
 const config = new BotConfig(process.env);
@@ -34,6 +34,7 @@ const roomJoins = roomIds.map(async (id) => {
             }
             const rules = [
                 [WHO_WE_ARE, sayWhoWeAre],
+                [SHOOT_THEM, shootUser],
                 [LIST_MEMBERS, sayWhoAreOurMemebers],
                 [LIST_PACKAGES, sayWhatAreOurPackages],
                 [ADD_IDEA, addUserscriptIdea],

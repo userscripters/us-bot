@@ -17,6 +17,7 @@ import {
     LIST_MEMBERS,
     LIST_PACKAGES,
     LIST_PROJECTS,
+    SHOOT_THEM,
     WHO_WE_ARE,
 } from "./expressions.js";
 import {
@@ -24,6 +25,7 @@ import {
     sayWhatAreOurPackages,
     sayWhoAreOurMemebers,
     sayWhoWeAre,
+    shootUser,
 } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 
@@ -83,6 +85,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const rules: ResponseRule[] = [
                 [WHO_WE_ARE, sayWhoWeAre],
+                [SHOOT_THEM, shootUser],
                 [LIST_MEMBERS, sayWhoAreOurMemebers],
                 [LIST_PACKAGES, sayWhatAreOurPackages],
                 [ADD_IDEA, addUserscriptIdea],

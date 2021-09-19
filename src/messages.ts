@@ -3,6 +3,14 @@ import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
 
 /**
+ * @summary shoots a user
+ */
+export const shootUser = (_config: BotConfig, text: string) => {
+    const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
+    return `@${userName} pew-pew!`;
+};
+
+/**
  * @summary has a little fun
  */
 export const sayPingPong = (_config: BotConfig, text: string) => {
