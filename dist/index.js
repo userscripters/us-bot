@@ -4,6 +4,7 @@ import entities from "html-entities";
 import Queue from "p-queue";
 import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, } from "./commands.js";
 import { BotConfig } from "./config.js";
+import { ADD_IDEA, ADD_REPO, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, WHO_WE_ARE, } from "./expressions.js";
 import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoWeAre, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 dotenv.config();
@@ -28,28 +29,13 @@ const roomJoins = roomIds.map(async (id) => {
                 return;
             }
             const rules = [
-                [/who are we/, sayWhoWeAre],
-                [
-                    /who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? members?/,
-                    sayWhoAreOurMemebers,
-                ],
-                [
-                    /what (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? packages?/,
-                    sayWhatAreOurPackages,
-                ],
-                [
-                    /(?:create|add|new)(?: (?:user)?script)? idea\s+.+/,
-                    addUserscriptIdea,
-                ],
-                [/(?:create|add|new) repo(?:sitory)?/, addRepository],
-                [
-                    /(?:list|our|show|display)(?: our|orgs?)? projects?/,
-                    listProjects,
-                ],
-                [
-                    /(?:list|show|display)(?: col(?:umn)?s (?:of|from|for))?(?: the)? ((?:\w+)|(?:"[\w\s]+?"))(?: project)?(?: col(?:umn)?s)?/,
-                    listProjectColumns,
-                ],
+                [WHO_WE_ARE, sayWhoWeAre],
+                [LIST_MEMBERS, sayWhoAreOurMemebers],
+                [LIST_PACKAGES, sayWhatAreOurPackages],
+                [ADD_IDEA, addUserscriptIdea],
+                [ADD_REPO, addRepository],
+                [LIST_PROJECTS, listProjects],
+                [LIST_COLUMNS, listProjectColumns],
             ];
             const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
             const response = await builder(config, text);
