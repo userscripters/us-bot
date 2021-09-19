@@ -76,6 +76,11 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 return;
             }
 
+            if (config.isAdmin(userId) && msg.targetUserId === bot.id) {
+                room.sendMessage("Yes, master?");
+                return;
+            }
+
             const rules: ResponseRule[] = [
                 [WHO_WE_ARE, sayWhoWeAre],
                 [LIST_MEMBERS, sayWhoAreOurMemebers],

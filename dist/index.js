@@ -28,6 +28,10 @@ const roomJoins = roomIds.map(async (id) => {
                     room.sendMessage(pingpong);
                 return;
             }
+            if (config.isAdmin(userId) && msg.targetUserId === bot.id) {
+                room.sendMessage("Yes, master?");
+                return;
+            }
             const rules = [
                 [WHO_WE_ARE, sayWhoWeAre],
                 [LIST_MEMBERS, sayWhoAreOurMemebers],
