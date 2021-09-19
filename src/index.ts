@@ -97,7 +97,17 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             Response: ${response}
             `);
 
-            queue.add(() => room.sendMessage(response));
+            const maxChars = 500;
+
+            const messages = response
+                .split(
+                    new RegExp(`(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|$)`, "gm")
+                )
+                .filter(Boolean);
+
+            for (const message of messages) {
+                queue.add(() => room.sendMessage(message));
+            }
         });
 
         await room.watch();

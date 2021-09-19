@@ -1,4 +1,4 @@
-import Client from "chatexchange";
+import Client, { ChatEventType } from "chatexchange";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
@@ -16,6 +16,7 @@ const bot = await client.getMe();
 const roomJoins = roomIds.map(async (id) => {
     try {
         const room = await client.joinRoom(+id);
+        room.ignore(ChatEventType.USER_JOINED, ChatEventType.USER_LEFT, ChatEventType.ROOM_RENAMED, ChatEventType.STARS_CHANGED);
         const queue = new Queue({ interval: config.getThrottle(id) });
         room.on("message", async (msg) => {
             const text = entities.decode(await msg.content);
@@ -55,7 +56,13 @@ const roomJoins = roomIds.map(async (id) => {
             Name:     ${msg.userName}
             Response: ${response}
             `);
-            queue.add(() => room.sendMessage(response));
+            const maxChars = 500;
+            const messages = response
+                .split(new RegExp(`(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|$)`, "gm"))
+                .filter(Boolean);
+            for (const message of messages) {
+                queue.add(() => room.sendMessage(message));
+            }
         });
         await room.watch();
         setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
