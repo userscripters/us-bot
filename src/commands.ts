@@ -97,7 +97,10 @@ export const listProjectColumns = async ({ org }: BotConfig, text: string) => {
     const [, projectName = ""] =
         /((?:\w+)|(?:"[\w\s]+?")) project/i.exec(text) || [];
 
-    const normalized = projectName?.toLowerCase().trim();
+    const normalized = projectName
+        ?.toLowerCase()
+        .trim()
+        .replace(/^"(.+)"$/, "$1");
 
     const prjRes = await oktokit.rest.projects.listForOrg({ org });
 

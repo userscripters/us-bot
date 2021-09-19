@@ -47,7 +47,7 @@ const roomJoins = roomIds.map(async (id) => {
                     listProjects,
                 ],
                 [
-                    /(?:list|show|display)(?: col(?:umn)?s (?:of|from))? ((?:\w+)|(?:"[\w\s]+?"))(?: project)?(?: col(?:umn)?s)?/,
+                    /(?:list|show|display)(?: col(?:umn)?s (?:of|from|for))? ((?:\w+)|(?:"[\w\s]+?"))(?: project)?(?: col(?:umn)?s)?/,
                     listProjectColumns,
                 ],
             ];
