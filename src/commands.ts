@@ -95,7 +95,7 @@ export const listProjects = async ({ org }: BotConfig) => {
  */
 export const listProjectColumns = async ({ org }: BotConfig, text: string) => {
     const [, projectName = ""] =
-        /((?:\w+)|(?:"[\w\s]+?")) project/i.exec(text) || [];
+        /((?:\w+)|(?:"[\w-+\s.!?]+?")) project/i.exec(text) || [];
 
     const normalized = projectName
         ?.toLowerCase()

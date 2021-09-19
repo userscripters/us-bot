@@ -58,7 +58,7 @@ export const listProjects = async ({ org }) => {
     return `Our projects: ${listify(...projects.map(({ html_url, name }) => mdLink(html_url, name)))}`;
 };
 export const listProjectColumns = async ({ org }, text) => {
-    const [, projectName = ""] = /((?:\w+)|(?:"[\w\s]+?")) project/i.exec(text) || [];
+    const [, projectName = ""] = /((?:\w+)|(?:"[\w-+\s.!?]+?")) project/i.exec(text) || [];
     const normalized = projectName
         ?.toLowerCase()
         .trim()
