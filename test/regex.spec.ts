@@ -15,6 +15,7 @@ describe("Regular expressions", () => {
             allMatch(LIST_COLUMNS, [
                 `list the "userscripts" project columns`,
                 `show columns from "user" project`,
+                `list columns for the "userscripts" project`,
             ]);
         });
 

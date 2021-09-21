@@ -6,8 +6,9 @@ export const ADD_IDEA = /^(?:create|add|new)(?: (?:user)?script)? idea\s+.+/;
 
 export const ADD_REPO = /^(?:create|add|new) repo(?:sitory)?/;
 
+// https://chat.stackoverflow.com/transcript/message/53071488#53071488
 export const LIST_COLUMNS =
-    /^(?:list|show|display)(?:( columns|)(?: (?:from|of|for) |)(?: (?:the) |)("\w+?" project)(?: columns|(?!\1)))/;
+    /^(?:list|show|display)(?:( columns(?!.*columns\s*$)|(?=.*columns$))(?: (?:from|of|for)|)(?: the|)( "\w+?" project)(?: columns)?)/;
 
 export const LIST_MEMBERS =
     /^who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? members?/;
