@@ -1,3 +1,4 @@
+import { readFile } from "fs/promises";
 import { BotConfig } from "./config.js";
 import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
@@ -34,6 +35,15 @@ export const sayWhoWeAre = async ({ org }: BotConfig) => {
     return `We are ${name} - ${description}.`;
 };
 
+/**
+ * @summary says who made the bot
+ */
+export const sayWhoMadeMe = async (_config: BotConfig) => {
+    const { author } = JSON.parse(
+        await readFile("./package.json", { encoding: "utf-8" })
+    );
+    return `${author.name} made me`;
+};
 /**
  * @summary says who UserScripters members are
  */

@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { LIST_COLUMNS } from "../src/expressions.js";
+import { LIST_COLUMNS, WHO_MADE_ME } from "../src/expressions.js";
 
 const allMatch = (regex: RegExp, matches: string[], shouldMatch = true) =>
     matches.forEach((txt) => {
@@ -10,6 +10,17 @@ const allMatch = (regex: RegExp, matches: string[], shouldMatch = true) =>
     });
 
 describe("Regular expressions", () => {
+    describe("author and contributors", () => {
+        it("should correctly match request for author", () => {
+            allMatch(WHO_MADE_ME, [
+                "who made you?",
+                "who made the bot",
+                "who made bot",
+                "who created you?",
+            ]);
+        });
+    });
+
     describe("project column listing", () => {
         it("should correctly match commands", () => {
             allMatch(LIST_COLUMNS, [

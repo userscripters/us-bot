@@ -1,3 +1,4 @@
+import { readFile } from "fs/promises";
 import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
 export const shootUser = (_config, text) => {
@@ -15,6 +16,10 @@ export const sayWhoWeAre = async ({ org }) => {
     const res = await oktokit.rest.orgs.get({ org });
     const { name, description } = res.data;
     return `We are ${name} - ${description}.`;
+};
+export const sayWhoMadeMe = async (_config) => {
+    const { author } = JSON.parse(await readFile("./package.json", { encoding: "utf-8" }));
+    return `${author.name} made me`;
 };
 export const sayWhoAreOurMemebers = async ({ org }) => {
     const res = await oktokit.rest.orgs.listPublicMembers({ org });
