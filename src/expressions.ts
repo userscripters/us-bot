@@ -7,7 +7,7 @@ export const ADD_IDEA = /^(?:create|add|new)(?: (?:user)?script)? idea\s+.+/;
 export const ADD_REPO = /^(?:create|add|new) repo(?:sitory)?/;
 
 export const LIST_COLUMNS =
-    /^(?:list|show|display)(?: col(?:umn)?s (?:of|from|for))?(?: the)? ((?:\w+)|(?:"[\w\s]+?"))(?: project)?(?: col(?:umn)?s)?/;
+    /^(?:list|show|display)(?:( columns|)(?: (?:from|of|for) |)(?: (?:the) |)("\w+?" project)(?: columns|(?!\1)))/;
 
 export const LIST_MEMBERS =
     /^who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? members?/;
