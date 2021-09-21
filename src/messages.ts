@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises";
+import { PackageJson } from "type-fest";
 import { BotConfig } from "./config.js";
 import { listify, mdLink, pluralize } from "./helpers.js";
 import oktokit from "./userscripters.js";
@@ -39,10 +40,21 @@ export const sayWhoWeAre = async ({ org }: BotConfig) => {
  * @summary says who made the bot
  */
 export const sayWhoMadeMe = async (_config: BotConfig) => {
-    const { author } = JSON.parse(
+    const { author, contributors = [] }: PackageJson = JSON.parse(
         await readFile("./package.json", { encoding: "utf-8" })
     );
-    return `${author.name} made me`;
+
+    const authorName = typeof author === "string" ? author : author?.name;
+
+    const names = contributors.map((p) =>
+        typeof p === "string" ? p : p.url ? mdLink(p.url, p.name) : p.name
+    );
+
+    const contribs = names.length
+        ? `, and ${listify(...names)} helped out`
+        : "";
+
+    return `${authorName} made me${contribs}`;
 };
 /**
  * @summary says who UserScripters members are

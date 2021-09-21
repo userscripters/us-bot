@@ -18,8 +18,13 @@ export const sayWhoWeAre = async ({ org }) => {
     return `We are ${name} - ${description}.`;
 };
 export const sayWhoMadeMe = async (_config) => {
-    const { author } = JSON.parse(await readFile("./package.json", { encoding: "utf-8" }));
-    return `${author.name} made me`;
+    const { author, contributors = [] } = JSON.parse(await readFile("./package.json", { encoding: "utf-8" }));
+    const authorName = typeof author === "string" ? author : author?.name;
+    const names = contributors.map((p) => typeof p === "string" ? p : p.url ? mdLink(p.url, p.name) : p.name);
+    const contribs = names.length
+        ? `, and ${listify(...names)} helped out`
+        : "";
+    return `${authorName} made me${contribs}`;
 };
 export const sayWhoAreOurMemebers = async ({ org }) => {
     const res = await oktokit.rest.orgs.listPublicMembers({ org });
