@@ -3,6 +3,7 @@ import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
+import { isIgnoredUser } from "./access.js";
 import {
     addRepository,
     addUserscriptIdea,
@@ -70,9 +71,11 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         const queue = new Queue({ interval: config.getThrottle(id) });
 
         room.on("message", async (msg: WebSocketEvent) => {
-            const text = entities.decode(await msg.content);
-
             const { userId } = msg;
+
+            if (isIgnoredUser(room, userId)) return;
+
+            const text = entities.decode(await msg.content);
 
             if (!config.isAdmin(userId) && bot.id !== userId) {
                 const pingpong = sayPingPong(config, text);

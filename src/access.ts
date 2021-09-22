@@ -20,20 +20,32 @@ export const getIgnoredUsers = (room: Room): Set<number> => {
 /**
  * @summary ignores a given user
  * @param room Room to ignore the user in
- * @param idOrUser user id or user to ignore
+ * @param user user id or user to ignore
  */
-export const ignoreUser = (room: Room, idOrUser: number | User): void => {
+export const ignoreUser = (room: Room, user: number | User): void => {
     const ignoredList = getIgnoredUsers(room);
-    const userId = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
+    const userId = typeof user === "number" ? user : user.id;
     ignoredList.add(userId);
 };
 
 /**
  * @summary removes the user from the list of ignored ones
- * @param room Room to unignore user in
+ * @param room Room to pardon the user in
+ * @param user user id or user to pardon
  */
-export const pardonUser = (room: Room, idOrUser: number | User): void => {
+export const pardonUser = (room: Room, user: number | User): void => {
     const ignoredList = getIgnoredUsers(room);
-    const userId = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
+    const userId = typeof user === "number" ? user : user.id;
     ignoredList.delete(userId);
+};
+
+/**
+ * @summary checks if a user is in the ignore list
+ * @param room Room to check the user in
+ * @param user user id or user to check
+ */
+export const isIgnoredUser = (room: Room, user: number | User): boolean => {
+    const ignoredList = getIgnoredUsers(room);
+    const userId = typeof user === "number" ? user : user.id;
+    return ignoredList.has(userId);
 };
