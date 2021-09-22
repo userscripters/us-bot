@@ -37,6 +37,12 @@ export const sayWhoWeAre = async ({ org }: BotConfig) => {
 };
 
 /**
+ * @summary responds to master's beckon
+ */
+export const sayMaster = (_config: BotConfig, text: string) =>
+    `Yes, master${text.includes("?") ? "!" : "?"}`;
+
+/**
  * @summary says who made the bot
  */
 export const sayWhoMadeMe = async (_config: BotConfig) => {

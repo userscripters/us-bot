@@ -23,6 +23,7 @@ import {
     WHO_WE_ARE,
 } from "./expressions.js";
 import {
+    sayMaster,
     sayPingPong,
     sayWhatAreOurPackages,
     sayWhoAreOurMemebers,
@@ -84,7 +85,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             }
 
             if (config.isAdmin(userId) && msg.targetUserId === bot.id) {
-                room.sendMessage("Yes, master?");
+                room.sendMessage(sayMaster(config, text));
                 return;
             }
 
