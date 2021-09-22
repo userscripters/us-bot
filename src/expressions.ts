@@ -20,3 +20,6 @@ export const LIST_PACKAGES =
 
 export const LIST_PROJECTS =
     /^(?:list|our|show|display)(?: our|orgs?)? projects?/;
+
+export const IGNORE_USER =
+    /^(?:ignore|do not listen to|(put)) @[\w-]+(?: on (?:the|a) naughty list|\1)/;
