@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { LIST_COLUMNS, WHO_MADE_ME } from "../src/expressions.js";
+import { LIST_COLUMNS, WHO_ARE_YOU, WHO_MADE_ME } from "../src/expressions.js";
 
 const allMatch = (regex: RegExp, matches: string[], shouldMatch = true) =>
     matches.forEach((txt) => {
@@ -10,7 +10,7 @@ const allMatch = (regex: RegExp, matches: string[], shouldMatch = true) =>
     });
 
 describe("Regular expressions", () => {
-    describe("author and contributors", () => {
+    describe("bot metadata", () => {
         it("should correctly match request for author", () => {
             allMatch(WHO_MADE_ME, [
                 "who made you?",
@@ -18,6 +18,17 @@ describe("Regular expressions", () => {
                 "who made bot",
                 "who created you?",
             ]);
+        });
+
+        it("should correctly match a who are you request", () => {
+            allMatch(WHO_ARE_YOU, [
+                "who are you?",
+                "who is the bot?",
+                "who is this bot?",
+                "what is this bot?",
+            ]);
+
+            allMatch(WHO_ARE_YOU, ["who are we?"], false);
         });
     });
 

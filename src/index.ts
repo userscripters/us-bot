@@ -19,6 +19,7 @@ import {
     LIST_PACKAGES,
     LIST_PROJECTS,
     SHOOT_THEM,
+    WHO_ARE_YOU,
     WHO_MADE_ME,
     WHO_WE_ARE,
 } from "./expressions.js";
@@ -27,6 +28,7 @@ import {
     sayPingPong,
     sayWhatAreOurPackages,
     sayWhoAreOurMemebers,
+    sayWhoIAm,
     sayWhoMadeMe,
     sayWhoWeAre,
     shootUser,
@@ -90,6 +92,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             }
 
             const rules: ResponseRule[] = [
+                [WHO_ARE_YOU, sayWhoIAm],
                 [WHO_WE_ARE, sayWhoWeAre],
                 [WHO_MADE_ME, sayWhoMadeMe],
                 [SHOOT_THEM, shootUser],

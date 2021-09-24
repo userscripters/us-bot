@@ -1,3 +1,5 @@
+export const WHO_ARE_YOU = /^wh(?:o|at) (?:are you|is(?: th[ei]s?)? bot)/;
+
 export const WHO_WE_ARE = /^who are (?:we|UserScripters)/;
 
 export const WHO_MADE_ME = /^who (?:made|created) (?:you|(?:the )?bot)/;
