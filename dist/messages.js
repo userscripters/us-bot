@@ -17,10 +17,12 @@ export const sayWhoWeAre = async ({ org }) => {
     return `We are ${name} - ${description}.`;
 };
 export const sayWhoIAm = async () => {
-    const { name = "bot" } = await readPackage();
-    const home = process.env.HOME;
-    const residence = home ? `live ${mdLink(home, "here")}` : "am homeless";
-    return `I am a ${name}, and I ${residence}`;
+    const { description = "bot" } = await readPackage();
+    const { BOT_HOME } = process.env;
+    const residence = BOT_HOME
+        ? `live ${mdLink(BOT_HOME, "here")}`
+        : "am homeless";
+    return `I am a ${description}, and I ${residence}`;
 };
 export const sayMaster = (_config, text) => `Yes, master${text.includes("?") ? "!" : "?"}`;
 export const sayWhoMadeMe = async (_config) => {
