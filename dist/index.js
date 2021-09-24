@@ -2,10 +2,11 @@ import Client, { ChatEventType } from "chatexchange";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
+import { isIgnoredUser } from "./access.js";
 import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, } from "./commands.js";
 import { BotConfig } from "./config.js";
-import { ADD_IDEA, ADD_REPO, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
-import { sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoMadeMe, sayWhoWeAre, shootUser, } from "./messages.js";
+import { ADD_IDEA, ADD_REPO, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
+import { sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 dotenv.config();
 const config = new BotConfig(process.env);
@@ -20,8 +21,10 @@ const roomJoins = roomIds.map(async (id) => {
         room.ignore(ChatEventType.USER_JOINED, ChatEventType.USER_LEFT, ChatEventType.ROOM_RENAMED, ChatEventType.STARS_CHANGED);
         const queue = new Queue({ interval: config.getThrottle(id) });
         room.on("message", async (msg) => {
-            const text = entities.decode(await msg.content);
             const { userId } = msg;
+            if (isIgnoredUser(room, userId))
+                return;
+            const text = entities.decode(await msg.content);
             if (!config.isAdmin(userId) && bot.id !== userId) {
                 const pingpong = sayPingPong(config, text);
                 if (pingpong)
@@ -29,10 +32,11 @@ const roomJoins = roomIds.map(async (id) => {
                 return;
             }
             if (config.isAdmin(userId) && msg.targetUserId === bot.id) {
-                room.sendMessage("Yes, master?");
+                room.sendMessage(sayMaster(config, text));
                 return;
             }
             const rules = [
+                [WHO_ARE_YOU, sayWhoIAm],
                 [WHO_WE_ARE, sayWhoWeAre],
                 [WHO_MADE_ME, sayWhoMadeMe],
                 [SHOOT_THEM, shootUser],

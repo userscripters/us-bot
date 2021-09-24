@@ -1,5 +1,4 @@
-import { readFile } from "fs/promises";
-import { listify, mdLink, pluralize } from "./helpers.js";
+import { listify, mdLink, pluralize, readPackage } from "./helpers.js";
 import oktokit from "./userscripters.js";
 export const shootUser = (_config, text) => {
     const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
@@ -17,8 +16,15 @@ export const sayWhoWeAre = async ({ org }) => {
     const { name, description } = res.data;
     return `We are ${name} - ${description}.`;
 };
+export const sayWhoIAm = async () => {
+    const { name = "bot" } = await readPackage();
+    const home = process.env.HOME;
+    const residence = home ? `live ${mdLink(home, "here")}` : "am homeless";
+    return `I am a ${name}, and I ${residence}`;
+};
+export const sayMaster = (_config, text) => `Yes, master${text.includes("?") ? "!" : "?"}`;
 export const sayWhoMadeMe = async (_config) => {
-    const { author, contributors = [] } = JSON.parse(await readFile("./package.json", { encoding: "utf-8" }));
+    const { author, contributors = [] } = await readPackage();
     const authorName = typeof author === "string" ? author : author?.name;
     const names = contributors.map((p) => typeof p === "string" ? p : p.url ? mdLink(p.url, p.name) : p.name);
     const contribs = names.length

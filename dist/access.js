@@ -5,13 +5,18 @@ export const getIgnoredUsers = (room) => {
     ignoredUsers.set(id, ignoredList);
     return ignoredList;
 };
-export const ignoreUser = (room, idOrUser) => {
+export const ignoreUser = (room, user) => {
     const ignoredList = getIgnoredUsers(room);
-    const userId = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
+    const userId = typeof user === "number" ? user : user.id;
     ignoredList.add(userId);
 };
-export const pardonUser = (room, idOrUser) => {
+export const pardonUser = (room, user) => {
     const ignoredList = getIgnoredUsers(room);
-    const userId = typeof idOrUser === "number" ? idOrUser : idOrUser.id;
+    const userId = typeof user === "number" ? user : user.id;
     ignoredList.delete(userId);
+};
+export const isIgnoredUser = (room, user) => {
+    const ignoredList = getIgnoredUsers(room);
+    const userId = typeof user === "number" ? user : user.id;
+    return ignoredList.has(userId);
 };

@@ -1,3 +1,4 @@
+import { readFile } from "fs/promises";
 export const splitENV = (env = "") => env.split(/\s*\|\s*/);
 export const mdLink = (url, title = url) => `[${title}](${url})`;
 export const pluralize = (num, text, suffix = "s") => {
@@ -12,3 +13,6 @@ export const splitArgs = (text) => text
     .split(/(?<!"[\w ]+)\s+(?![\w ]+")/)
     .map((t) => t.replace(/^"(.+)"$/, "$1"));
 export const sleep = (sec = 1) => new Promise((r) => setTimeout(r, sec * 1e3));
+export const readPackage = async () => {
+    return JSON.parse(await readFile("./package.json", { encoding: "utf-8" }));
+};
