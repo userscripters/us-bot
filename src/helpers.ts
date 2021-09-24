@@ -1,3 +1,6 @@
+import { readFile } from "fs/promises";
+import { PackageJson } from "type-fest";
+
 /**
  * @summary splits ENV field into an array of strings
  */
@@ -38,3 +41,10 @@ export const splitArgs = (text: string) =>
  * @summary sleeps for a specified number of seconds
  */
 export const sleep = (sec = 1) => new Promise((r) => setTimeout(r, sec * 1e3));
+
+/**
+ * @summary reads package.json file
+ */
+export const readPackage = async (): Promise<PackageJson> => {
+    return JSON.parse(await readFile("./package.json", { encoding: "utf-8" }));
+};

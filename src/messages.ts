@@ -1,7 +1,5 @@
-import { readFile } from "fs/promises";
-import { PackageJson } from "type-fest";
 import { BotConfig } from "./config.js";
-import { listify, mdLink, pluralize } from "./helpers.js";
+import { listify, mdLink, pluralize, readPackage } from "./helpers.js";
 import oktokit from "./userscripters.js";
 
 /**
@@ -46,9 +44,7 @@ export const sayMaster = (_config: BotConfig, text: string) =>
  * @summary says who made the bot
  */
 export const sayWhoMadeMe = async (_config: BotConfig) => {
-    const { author, contributors = [] }: PackageJson = JSON.parse(
-        await readFile("./package.json", { encoding: "utf-8" })
-    );
+    const { author, contributors = [] } = await readPackage();
 
     const authorName = typeof author === "string" ? author : author?.name;
 
