@@ -38,13 +38,13 @@ export const sayWhoWeAre = async ({ org }: BotConfig) => {
  * @summary says who the bot is
  */
 export const sayWhoIAm = async () => {
-    const { name = "bot" } = await readPackage();
+    const { description = "bot" } = await readPackage();
 
     const home = process.env.HOME;
 
     const residence = home ? `live ${mdLink(home, "here")}` : "am homeless";
 
-    return `I am a ${name}, and I ${residence}`;
+    return `I am a ${description}, and I ${residence}`;
 };
 
 /**
