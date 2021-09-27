@@ -9,3 +9,4 @@ export const LIST_MEMBERS = /^who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation
 export const LIST_PACKAGES = /^what (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? packages?/;
 export const LIST_PROJECTS = /^(?:list|our|show|display)(?: our|orgs?)? projects?/;
 export const IGNORE_USER = /^(?:ignore|do not listen to|(put)) @[\w-]+(?: on (?:the|a) naughty list|\1)/;
+export const DEFINE_WORD = /^define (?:\w+|"\w+")/;

@@ -1,4 +1,5 @@
 import { listify, mdLink, pluralize, readPackage } from "./helpers.js";
+import { getDefinitions } from "./oxford.js";
 import oktokit from "./userscripters.js";
 export const shootUser = (_config, text) => {
     const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
@@ -69,4 +70,13 @@ export const sayCreatedRepo = ({ html_url, private: p, name, }, fromTemplate = f
     const pvt = p ? " private" : "";
     const tpl = fromTemplate ? " templated" : "";
     return `Created a${tpl}${pvt} ${mdLink(html_url, "repository")} for ${name}`;
+};
+export const sayDefineWord = async (_config, text) => {
+    const [, word] = /^define (\w+|"\w+")/.exec(text) || [];
+    if (!word)
+        return "Cannot define nothing, sorry!";
+    const definitions = await getDefinitions(word);
+    return definitions.length
+        ? `${word} can mean:\n- ${definitions.join("\n- ")}`
+        : `No definitions found for ${word}, sorry!`;
 };

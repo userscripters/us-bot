@@ -14,6 +14,7 @@ import { BotConfig } from "./config.js";
 import {
     ADD_IDEA,
     ADD_REPO,
+    DEFINE_WORD,
     LIST_COLUMNS,
     LIST_MEMBERS,
     LIST_PACKAGES,
@@ -24,6 +25,7 @@ import {
     WHO_WE_ARE,
 } from "./expressions.js";
 import {
+    sayDefineWord,
     sayMaster,
     sayPingPong,
     sayWhatAreOurPackages,
@@ -102,6 +104,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 [ADD_REPO, addRepository],
                 [LIST_PROJECTS, listProjects],
                 [LIST_COLUMNS, listProjectColumns],
+                [DEFINE_WORD, sayDefineWord],
             ];
 
             const builder = rules.reduce(

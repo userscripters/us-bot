@@ -25,3 +25,5 @@ export const LIST_PROJECTS =
 
 export const IGNORE_USER =
     /^(?:ignore|do not listen to|(put)) @[\w-]+(?: on (?:the|a) naughty list|\1)/;
+
+export const DEFINE_WORD = /^define (?:\w+|"\w+")/;

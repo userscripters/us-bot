@@ -1,5 +1,6 @@
 import { BotConfig } from "./config.js";
 import { listify, mdLink, pluralize, readPackage } from "./helpers.js";
+import { getDefinitions } from "./oxford.js";
 import oktokit from "./userscripters.js";
 
 /**
@@ -140,4 +141,19 @@ export const sayCreatedRepo = (
         html_url,
         "repository"
     )} for ${name}`;
+};
+
+/**
+ * @summary defines a word
+ */
+export const sayDefineWord = async (_config: BotConfig, text: string) => {
+    const [, word] = /^define (\w+|"\w+")/.exec(text) || [];
+
+    if (!word) return "Cannot define nothing, sorry!";
+
+    const definitions = await getDefinitions(word);
+
+    return definitions.length
+        ? `${word} can mean:\n- ${definitions.join("\n- ")}`
+        : `No definitions found for ${word}, sorry!`;
 };
