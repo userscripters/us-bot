@@ -5,8 +5,8 @@ import Queue from "p-queue";
 import { isIgnoredUser } from "./access.js";
 import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, } from "./commands.js";
 import { BotConfig } from "./config.js";
-import { ADD_IDEA, ADD_REPO, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
-import { sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser, } from "./messages.js";
+import { ADD_IDEA, ADD_REPO, DEFINE_WORD, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
+import { sayDefineWord, sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 dotenv.config();
 const config = new BotConfig(process.env);
@@ -46,6 +46,7 @@ const roomJoins = roomIds.map(async (id) => {
                 [ADD_REPO, addRepository],
                 [LIST_PROJECTS, listProjects],
                 [LIST_COLUMNS, listProjectColumns],
+                [DEFINE_WORD, sayDefineWord],
             ];
             const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
             const response = await builder(config, text);
