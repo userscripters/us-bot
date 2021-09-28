@@ -6,6 +6,8 @@ export const WHO_MADE_ME = /^who (?:made|created) (?:you|(?:the )?bot)/;
 
 export const SHOOT_THEM = /^shoot @[\w-]+/;
 
+export const ALICE_THEM = /^off with @([\w-]+)(?:'s)? head/;
+
 export const ADD_IDEA = /^(?:create|add|new)(?: (?:user)?script)? idea\s+.+/;
 
 export const ADD_REPO = /^(?:create|add|new) repo(?:sitory)?/;

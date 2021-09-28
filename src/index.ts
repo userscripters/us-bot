@@ -14,6 +14,7 @@ import { BotConfig } from "./config.js";
 import {
     ADD_IDEA,
     ADD_REPO,
+    ALICE_THEM,
     DEFINE_WORD,
     LIST_COLUMNS,
     LIST_MEMBERS,
@@ -25,6 +26,7 @@ import {
     WHO_WE_ARE,
 } from "./expressions.js";
 import {
+    aliceUser,
     sayDefineWord,
     sayMaster,
     sayPingPong,
@@ -98,6 +100,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 [WHO_WE_ARE, sayWhoWeAre],
                 [WHO_MADE_ME, sayWhoMadeMe],
                 [SHOOT_THEM, shootUser],
+                [ALICE_THEM, aliceUser],
                 [LIST_MEMBERS, sayWhoAreOurMemebers],
                 [LIST_PACKAGES, sayWhatAreOurPackages],
                 [ADD_IDEA, addUserscriptIdea],

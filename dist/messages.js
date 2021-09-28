@@ -5,6 +5,10 @@ export const shootUser = (_config, text) => {
     const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
     return `@${userName} pew-pew!`;
 };
+export const aliceUser = (_config, text) => {
+    const [, userName] = /with @([\w-]+)/i.exec(text) || [];
+    return `@${userName} chop-chop!`;
+};
 export const sayPingPong = (_config, text) => {
     const responses = [
         [/pong/i, "ping"],
