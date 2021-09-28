@@ -8,7 +8,7 @@ import oktokit from "./userscripters.js";
  * @summary shoots a user
  */
 export const shootUser = (_config: BotConfig, text: string) => {
-    const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
+    const [, userName] = /^shoot @([\w.-]+)/i.exec(text) || [];
     return `@${userName} pew-pew!`;
 };
 
@@ -17,7 +17,7 @@ export const shootUser = (_config: BotConfig, text: string) => {
  * @summary you know, Queen of Hearts and all that
  */
 export const aliceUser = (_config: BotConfig, text: string) => {
-    const [, userName] = /with @([\w-]+)/i.exec(text) || [];
+    const [, userName] = /with @([\w.-]+)/i.exec(text) || [];
     return `@${userName} chop-chop!`;
 };
 

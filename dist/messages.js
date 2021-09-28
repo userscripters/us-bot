@@ -2,11 +2,11 @@ import { listify, mdLink, pluralize, readPackage } from "./helpers.js";
 import { getDefinitions } from "./oxford.js";
 import oktokit from "./userscripters.js";
 export const shootUser = (_config, text) => {
-    const [, userName] = /^shoot @([\w-]+)/i.exec(text) || [];
+    const [, userName] = /^shoot @([\w.-]+)/i.exec(text) || [];
     return `@${userName} pew-pew!`;
 };
 export const aliceUser = (_config, text) => {
-    const [, userName] = /with @([\w-]+)/i.exec(text) || [];
+    const [, userName] = /with @([\w.-]+)/i.exec(text) || [];
     return `@${userName} chop-chop!`;
 };
 export const sayPingPong = (_config, text) => {
