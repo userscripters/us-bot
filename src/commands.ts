@@ -23,7 +23,7 @@ const commands = [addIdea, createRepo];
 /**
  * @summary shows manual for a given command
  */
-export const sayManual = async (_config: BotConfig, text: string) => {
+export const sayManual = (_config: BotConfig, text: string) => {
     const [, commandName] =
         /(?:(?:show|display) help|man(?:ual)?) for(?: the)? (.+?) command/.exec(
             text
