@@ -3,6 +3,7 @@ import { BotConfig } from "./config.js";
 import { listify, mdLink, splitArgs } from "./helpers.js";
 import { sayCreatedRepo } from "./messages.js";
 import oktokit from "./userscripters.js";
+import { safeMatch } from "./utils/regex.js";
 
 const addIdea = new Command("add-idea");
 addIdea
@@ -24,10 +25,10 @@ const commands = [addIdea, createRepo];
  * @summary shows manual for a given command
  */
 export const sayManual = (_config: BotConfig, text: string) => {
-    const [, commandName] =
-        /(?:(?:show|display) help|man(?:ual)?) for(?: the)? (.+?) command/.exec(
-            text
-        ) || [];
+    const [commandName] = safeMatch(
+        /(?:(?:show|display) help|man(?:ual)?) for(?: the)? (.+?) command/,
+        text
+    );
 
     const command = commands.find((command) => command.name() === commandName);
     return command
