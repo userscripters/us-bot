@@ -18,6 +18,23 @@ createRepo
     .option("-t, --template <template>", "Project template")
     .option("-p, --private", "Visibility");
 
+const commands = [addIdea, createRepo];
+
+/**
+ * @summary shows manual for a given command
+ */
+export const sayManual = async (_config: BotConfig, text: string) => {
+    const [, commandName] =
+        /(?:(?:show|display) help|man(?:ual)?) for(?: the)? (.+?) command/.exec(
+            text
+        ) || [];
+
+    const command = commands.find((command) => command.name() === commandName);
+    return command
+        ? command.helpInformation()
+        : `there is no "${commandName}" command`;
+};
+
 /**
  * @summary adds an idea to the Userscripts project
  */

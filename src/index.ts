@@ -9,6 +9,7 @@ import {
     addUserscriptIdea,
     listProjectColumns,
     listProjects,
+    sayManual,
 } from "./commands.js";
 import { BotConfig } from "./config.js";
 import {
@@ -21,6 +22,7 @@ import {
     LIST_PACKAGES,
     LIST_PROJECTS,
     SHOOT_THEM,
+    SHOW_HELP,
     WHO_ARE_YOU,
     WHO_MADE_ME,
     WHO_WE_ARE,
@@ -108,6 +110,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 [LIST_PROJECTS, listProjects],
                 [LIST_COLUMNS, listProjectColumns],
                 [DEFINE_WORD, sayDefineWord],
+                [SHOW_HELP, sayManual],
             ];
 
             const builder = rules.reduce(
