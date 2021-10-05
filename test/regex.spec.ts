@@ -1,5 +1,10 @@
 import { expect } from "chai";
-import { LIST_COLUMNS, WHO_ARE_YOU, WHO_MADE_ME } from "../src/expressions.js";
+import {
+    LIST_COLUMNS,
+    SHOW_HELP,
+    WHO_ARE_YOU,
+    WHO_MADE_ME,
+} from "../src/expressions.js";
 
 const allMatch = (regex: RegExp, matches: string[], shouldMatch = true) =>
     matches.forEach((txt) => {
@@ -29,6 +34,18 @@ describe("Regular expressions", () => {
             ]);
 
             allMatch(WHO_ARE_YOU, ["who are we?"], false);
+        });
+    });
+
+    describe("command help", () => {
+        it("should correctly match commands", () => {
+            allMatch(SHOW_HELP, [
+                "show help for the add-idea command",
+                "show help for add-idea command",
+                "display help for add-idea command",
+                "man for add-idea command",
+                "manual for the add-idea command",
+            ]);
         });
     });
 
