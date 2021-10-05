@@ -31,4 +31,4 @@ export const IGNORE_USER =
 export const DEFINE_WORD = /^define (?:\w+|"\w+")/;
 
 export const SHOW_HELP =
-    /(?:(?:show|display) help|man(?:ual)?) for(?: the)?.+?command/;
+    /(?:(?:show|display) help|man(?:ual)?) for(?: the)?.(?!for ).+?command/;
