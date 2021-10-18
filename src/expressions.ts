@@ -10,6 +10,8 @@ export const ALICE_THEM = /^off with @([\w.-]+)(?:'s)? head/;
 
 export const ADD_IDEA = /^(?:create|add|new)(?: (?:user)?script)? idea\s+.+/;
 
+export const MOVE_IDEA = /^(move|shift)(?: (?:user)?script)? idea/;
+
 export const ADD_REPO = /^(?:create|add|new) repo(?:sitory)?/;
 
 // https://chat.stackoverflow.com/transcript/message/53071488#53071488

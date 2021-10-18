@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import {
     LIST_COLUMNS,
+    MOVE_IDEA,
     SHOW_HELP,
     WHO_ARE_YOU,
     WHO_MADE_ME,
@@ -64,6 +65,18 @@ describe("Regular expressions", () => {
                 [`show "user" project`, `show our projects`],
                 false
             );
+        });
+    });
+
+    describe("userscript idea moving", () => {
+        it("should correctly match commands", () => {
+            allMatch(MOVE_IDEA, [
+                "move script idea",
+                "move userscript idea",
+                "shift idea",
+            ]);
+
+            allMatch(MOVE_IDEA, ["create userscript idea"], false);
         });
     });
 });
