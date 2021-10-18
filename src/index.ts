@@ -40,6 +40,7 @@ import {
     shootUser,
 } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
+import { getRandomBoolean } from "./utils/random.js";
 
 type JoinStatus = {
     id: string;
@@ -86,7 +87,11 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const text = entities.decode(await msg.content);
 
-            if (!config.isAdmin(userId) && bot.id !== userId) {
+            if (
+                !config.isAdmin(userId) &&
+                bot.id !== userId &&
+                getRandomBoolean()
+            ) {
                 const pingpong = sayPingPong(config, text);
                 if (pingpong) room.sendMessage(pingpong);
                 return;

@@ -3,11 +3,12 @@ import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
 import { isIgnoredUser } from "./access.js";
-import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, } from "./commands.js";
+import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, sayManual, } from "./commands.js";
 import { BotConfig } from "./config.js";
-import { ADD_IDEA, ADD_REPO, ALICE_THEM, DEFINE_WORD, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
+import { ADD_IDEA, ADD_REPO, ALICE_THEM, DEFINE_WORD, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, SHOOT_THEM, SHOW_HELP, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
 import { aliceUser, sayDefineWord, sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
+import { getRandomBoolean } from "./utils/random.js";
 dotenv.config();
 const config = new BotConfig(process.env);
 config.debug();
@@ -25,7 +26,9 @@ const roomJoins = roomIds.map(async (id) => {
             if (isIgnoredUser(room, userId))
                 return;
             const text = entities.decode(await msg.content);
-            if (!config.isAdmin(userId) && bot.id !== userId) {
+            if (!config.isAdmin(userId) &&
+                bot.id !== userId &&
+                getRandomBoolean()) {
                 const pingpong = sayPingPong(config, text);
                 if (pingpong)
                     room.sendMessage(pingpong);
@@ -48,6 +51,7 @@ const roomJoins = roomIds.map(async (id) => {
                 [LIST_PROJECTS, listProjects],
                 [LIST_COLUMNS, listProjectColumns],
                 [DEFINE_WORD, sayDefineWord],
+                [SHOW_HELP, sayManual],
             ];
             const builder = rules.reduce((a, [r, b]) => (r.test(text) ? b : a), (() => ""));
             const response = await builder(config, text);

@@ -2,6 +2,7 @@ import { Command } from "commander";
 import { listify, mdLink, splitArgs } from "./helpers.js";
 import { sayCreatedRepo } from "./messages.js";
 import oktokit from "./userscripters.js";
+import { safeMatch } from "./utils/regex.js";
 const addIdea = new Command("add-idea");
 addIdea
     .requiredOption("-c, --column <id>", "Column id")
@@ -14,6 +15,14 @@ createRepo
     .requiredOption("-d, --description <text>", "Project description")
     .option("-t, --template <template>", "Project template")
     .option("-p, --private", "Visibility");
+const commands = [addIdea, createRepo];
+export const sayManual = (_config, text) => {
+    const [commandName] = safeMatch(/(?:(?:show|display) help|man(?:ual)?) for(?: the)? (.+?) command/, text);
+    const command = commands.find((command) => command.name() === commandName);
+    return command
+        ? command.helpInformation()
+        : `there is no "${commandName}" command`;
+};
 export const addUserscriptIdea = async ({ org }, text) => {
     const args = splitArgs(text);
     const parsed = addIdea.parse(args, { from: "user" });
