@@ -9,6 +9,7 @@ import {
     addUserscriptIdea,
     listProjectColumns,
     listProjects,
+    moveUserscriptIdea,
     sayManual,
 } from "./commands.js";
 import { BotConfig } from "./config.js";
@@ -21,6 +22,7 @@ import {
     LIST_MEMBERS,
     LIST_PACKAGES,
     LIST_PROJECTS,
+    MOVE_IDEA,
     SHOOT_THEM,
     SHOW_HELP,
     WHO_ARE_YOU,
@@ -111,6 +113,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 [LIST_MEMBERS, sayWhoAreOurMemebers],
                 [LIST_PACKAGES, sayWhatAreOurPackages],
                 [ADD_IDEA, addUserscriptIdea],
+                [MOVE_IDEA, moveUserscriptIdea],
                 [ADD_REPO, addRepository],
                 [LIST_PROJECTS, listProjects],
                 [LIST_COLUMNS, listProjectColumns],

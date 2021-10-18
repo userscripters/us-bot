@@ -9,13 +9,18 @@ addIdea
     .requiredOption("-s, --summary <text>", "Idea summary")
     .option("-o, --repository <link>", "Repository if exists")
     .option("-r, --reference <link>", "Inspiration reference");
+const moveIdea = new Command("move-idea");
+moveIdea
+    .requiredOption("-i, --id <id>", "Idea id to move")
+    .requiredOption("-t, --to <id>", "Target column id")
+    .option("-p, --position <top|bottom>", "Card position");
 const createRepo = new Command("create-repo");
 createRepo
     .requiredOption("-n --name <name>", "Project name")
     .requiredOption("-d, --description <text>", "Project description")
     .option("-t, --template <template>", "Project template")
     .option("-p, --private", "Visibility");
-const commands = [addIdea, createRepo];
+const commands = [addIdea, createRepo, moveIdea];
 export const sayManual = (_config, text) => {
     const [commandName] = safeMatch(/(?:(?:show|display) help|man(?:ual)?) for(?: the)? (.+?) command/, text);
     const command = commands.find((command) => command.name() === commandName);
@@ -43,6 +48,23 @@ export const addUserscriptIdea = async ({ org }, text) => {
     const { number } = pres.data;
     const html_url = `https://github.com/orgs/${org}/projects/${number}#card-${id}`;
     return `Successfully ${mdLink(html_url, "created an idea")}`;
+};
+export const moveUserscriptIdea = async ({ org }, text) => {
+    const args = splitArgs(text);
+    const parsed = moveIdea.parse(args, { from: "user" });
+    const { id, to, position = "top" } = parsed.opts();
+    const res = await oktokit.rest.projects.moveCard({
+        card_id: +id,
+        position,
+        column_id: +to,
+    });
+    const cres = await oktokit.rest.projects.getColumn({ column_id: +to });
+    const { project_url } = cres.data;
+    const projectId = +project_url.replace(/\D+/, "");
+    const pres = await oktokit.rest.projects.get({ project_id: projectId });
+    const { number } = pres.data;
+    const html_url = `https://github.com/orgs/${org}/projects/${number}#card-${id}`;
+    return `${res.status ? "successfully moved" : "failed to move"} ${mdLink(html_url, "the idea")}`;
 };
 export const addRepository = async ({ org }, text) => {
     const args = splitArgs(text);

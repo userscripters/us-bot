@@ -4,6 +4,7 @@ export const WHO_MADE_ME = /^who (?:made|created) (?:you|(?:the )?bot)/;
 export const SHOOT_THEM = /^shoot @[\w.-]+/;
 export const ALICE_THEM = /^off with @([\w.-]+)(?:'s)? head/;
 export const ADD_IDEA = /^(?:create|add|new)(?: (?:user)?script)? idea\s+.+/;
+export const MOVE_IDEA = /^(move|shift)(?: (?:user)?script)? idea/;
 export const ADD_REPO = /^(?:create|add|new) repo(?:sitory)?/;
 export const LIST_COLUMNS = /^(?:list|show|display)(?:( columns(?!.*columns\s*$)|(?=.*columns$))(?: (?:from|of|for)|)(?: the|)( "\w+?" project)(?: columns)?)/;
 export const LIST_MEMBERS = /^who (?:are|is)(?: (?:the|our))?(?: organi[sz]ation)? members?/;
