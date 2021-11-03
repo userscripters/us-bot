@@ -3,7 +3,7 @@ import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { isIgnoredUser } from "./access.js";
+import { isIgnoredUser } from "./guards.js";
 import {
     addRepository,
     addUserscriptIdea,

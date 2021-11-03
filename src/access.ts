@@ -38,14 +38,3 @@ export const pardonUser = (room: Room, user: number | User): void => {
     const userId = typeof user === "number" ? user : user.id;
     ignoredList.delete(userId);
 };
-
-/**
- * @summary checks if a user is in the ignore list
- * @param room Room to check the user in
- * @param user user id or user to check
- */
-export const isIgnoredUser = (room: Room, user: number | User): boolean => {
-    const ignoredList = getIgnoredUsers(room);
-    const userId = typeof user === "number" ? user : user.id;
-    return ignoredList.has(userId);
-};
