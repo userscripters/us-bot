@@ -13,3 +13,10 @@ export const isIgnoredUser = (room: Room, user: number | User): boolean => {
     return ignoredList.has(userId);
 };
 
+/**
+ * @summary checks if a given room matches the id
+ * @param room Room to check
+ * @param roomId room id to compare to
+ */
+export const isSameRoom = (room: number | Room, roomId: number) =>
+    (typeof room === "number" ? room : room.id) === roomId;

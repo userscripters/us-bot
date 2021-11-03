@@ -3,7 +3,6 @@ import type WebSocketEvent from "chatexchange/dist/WebsocketEvent";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { isIgnoredUser } from "./guards.js";
 import {
     addRepository,
     addUserscriptIdea,
@@ -29,6 +28,7 @@ import {
     WHO_MADE_ME,
     WHO_WE_ARE,
 } from "./expressions.js";
+import { isIgnoredUser, isSameRoom } from "./guards.js";
 import {
     aliceUser,
     sayDefineWord,
@@ -85,7 +85,12 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         room.on("message", async (msg: WebSocketEvent) => {
             const { userId } = msg;
 
-            if (isIgnoredUser(room, userId)) return;
+            if (
+                isIgnoredUser(room, userId) ||
+                !isSameRoom(room, await msg.roomId)
+            ) {
+                return;
+            }
 
             const text = entities.decode(await msg.content);
 

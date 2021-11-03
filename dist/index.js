@@ -2,10 +2,10 @@ import Client, { ChatEventType } from "chatexchange";
 import dotenv from "dotenv";
 import entities from "html-entities";
 import Queue from "p-queue";
-import { isIgnoredUser } from "./access.js";
 import { addRepository, addUserscriptIdea, listProjectColumns, listProjects, moveUserscriptIdea, sayManual, } from "./commands.js";
 import { BotConfig } from "./config.js";
 import { ADD_IDEA, ADD_REPO, ALICE_THEM, DEFINE_WORD, LIST_COLUMNS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, MOVE_IDEA, SHOOT_THEM, SHOW_HELP, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE, } from "./expressions.js";
+import { isIgnoredUser, isSameRoom } from "./guards.js";
 import { aliceUser, sayDefineWord, sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser, } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 import { getRandomBoolean } from "./utils/random.js";
@@ -23,8 +23,10 @@ const roomJoins = roomIds.map(async (id) => {
         const queue = new Queue({ interval: config.getThrottle(id) });
         room.on("message", async (msg) => {
             const { userId } = msg;
-            if (isIgnoredUser(room, userId))
+            if (isIgnoredUser(room, userId) ||
+                !isSameRoom(room, await msg.roomId)) {
                 return;
+            }
             const text = entities.decode(await msg.content);
             if (!config.isAdmin(userId) &&
                 bot.id !== userId &&
