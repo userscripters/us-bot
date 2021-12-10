@@ -7,6 +7,7 @@ import { safeMatch } from "./utils/regex.js";
 
 const addIdea = new Command("add-idea");
 addIdea
+    .description("Logs a new idea for a userscript")
     .requiredOption("-c, --column <id>", "Column id")
     .requiredOption("-s, --summary <text>", "Idea summary")
     .option("-o, --repository <link>", "Repository if exists")
@@ -14,12 +15,14 @@ addIdea
 
 const moveIdea = new Command("move-idea");
 moveIdea
+    .description("Updates status of a userscript idea")
     .requiredOption("-i, --id <id>", "Idea id to move")
     .requiredOption("-t, --to <id>", "Target column id")
     .option("-p, --position <top|bottom>", "Card position");
 
 const createRepo = new Command("create-repo");
 createRepo
+    .description("Creates a [templated] GitHub repository")
     .requiredOption("-n --name <name>", "Project name")
     .requiredOption("-d, --description <text>", "Project description")
     .option("-t, --template <template>", "Project template")
