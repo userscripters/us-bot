@@ -46,6 +46,18 @@ export const sayManual = (_config: BotConfig, text: string) => {
 };
 
 /**
+ * @summary lists all available commands
+ */
+export const listCommands = () => {
+    return commands.reduce((acc, command) => {
+        const name = command.name();
+        const desc = command.description();
+        const ability = `- ${name}: ${desc}`;
+        return `${acc}\n${ability}`
+    }, "My abilities include:");
+}
+
+/**
  * @summary adds an idea to the Userscripts project
  */
 export const addUserscriptIdea = async ({ org }: BotConfig, text: string) => {
