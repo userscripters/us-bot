@@ -44,6 +44,7 @@ import {
     shootUser,
 } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
+import { stripLeadingMention } from "./utils/chat.js";
 import { getRandomBoolean } from "./utils/random.js";
 
 type JoinStatus = {
@@ -129,8 +130,13 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 [LIST_COMMANDS, listCommands]
             ];
 
+            const name = await bot.name;
+            const stripped = stripLeadingMention(text, name);
+
             const builder = rules.reduce(
-                (a, [r, b]) => (r.test(text) ? b : a),
+                (a, [r, b]) => {
+                    return r.test(stripped) ? b : a;
+                },
                 (() => "") as ResponseBuilder
             );
 
