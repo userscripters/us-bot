@@ -13,3 +13,4 @@ export const LIST_PROJECTS = /^(?:list|our|show|display)(?: our|orgs?)? projects
 export const IGNORE_USER = /^(?:ignore|do not listen to|(put)) @[\w-]+(?: on (?:the|a) naughty list|\1)/;
 export const DEFINE_WORD = /^define (?:\w+|"\w+")/;
 export const SHOW_HELP = /(?:(?:show|display) help|man(?:ual)?) for(?: the)?.(?!for ).+?command/;
+export const LIST_COMMANDS = /^(?:help|man(?:ual)?|commands)$/;

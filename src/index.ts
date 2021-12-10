@@ -107,11 +107,6 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 return;
             }
 
-            if (config.isAdmin(userId) && msg.targetUserId === bot.id) {
-                room.sendMessage(sayMaster(config, text));
-                return;
-            }
-
             const rules: ResponseRule[] = [
                 [WHO_ARE_YOU, sayWhoIAm],
                 [WHO_WE_ARE, sayWhoWeAre],
@@ -141,13 +136,21 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             );
 
             const response = await builder(config, text);
-            if (!response) return;
+
+            const isAdmin = config.isAdmin(userId);
 
             console.debug(`
             From:     ${userId}
             Name:     ${msg.userName}
             Response: ${response}
             `);
+
+            if (!response && !isAdmin) return;
+
+            if (!response && isAdmin && msg.targetUserId === bot.id) {
+                room.sendMessage(sayMaster(config, text));
+                return;
+            }
 
             const maxChars = 500;
 
