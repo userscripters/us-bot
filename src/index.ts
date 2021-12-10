@@ -6,6 +6,7 @@ import Queue from "p-queue";
 import {
     addRepository,
     addUserscriptIdea,
+    listCommands,
     listProjectColumns,
     listProjects,
     moveUserscriptIdea,
@@ -18,6 +19,7 @@ import {
     ALICE_THEM,
     DEFINE_WORD,
     LIST_COLUMNS,
+    LIST_COMMANDS,
     LIST_MEMBERS,
     LIST_PACKAGES,
     LIST_PROJECTS,
@@ -124,6 +126,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 [LIST_COLUMNS, listProjectColumns],
                 [DEFINE_WORD, sayDefineWord],
                 [SHOW_HELP, sayManual],
+                [LIST_COMMANDS, listCommands]
             ];
 
             const builder = rules.reduce(
