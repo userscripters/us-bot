@@ -80,7 +80,8 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             ChatEventType.USER_JOINED,
             ChatEventType.USER_LEFT,
             ChatEventType.ROOM_RENAMED,
-            ChatEventType.STARS_CHANGED
+            ChatEventType.STARS_CHANGED,
+            ChatEventType.USER_MENTIONED
         );
 
         const queue = new Queue({ interval: config.getThrottle(id) });

@@ -20,7 +20,7 @@ const bot = await client.getMe();
 const roomJoins = roomIds.map(async (id) => {
     try {
         const room = await client.joinRoom(+id);
-        room.ignore(ChatEventType.USER_JOINED, ChatEventType.USER_LEFT, ChatEventType.ROOM_RENAMED, ChatEventType.STARS_CHANGED);
+        room.ignore(ChatEventType.USER_JOINED, ChatEventType.USER_LEFT, ChatEventType.ROOM_RENAMED, ChatEventType.STARS_CHANGED, ChatEventType.USER_MENTIONED);
         const queue = new Queue({ interval: config.getThrottle(id) });
         room.on("message", async (msg) => {
             const { userId } = msg;
