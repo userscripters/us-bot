@@ -97,8 +97,10 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const text = entities.decode(await msg.content);
 
+            const isAdmin = config.isAdmin(userId);
+
             if (
-                !config.isAdmin(userId) &&
+                !isAdmin &&
                 bot.id !== userId &&
                 getRandomBoolean()
             ) {
@@ -136,8 +138,6 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
             );
 
             const response = await builder(config, text);
-
-            const isAdmin = config.isAdmin(userId);
 
             console.debug(`
             From:     ${userId}

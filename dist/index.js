@@ -29,7 +29,8 @@ const roomJoins = roomIds.map(async (id) => {
                 return;
             }
             const text = entities.decode(await msg.content);
-            if (!config.isAdmin(userId) &&
+            const isAdmin = config.isAdmin(userId);
+            if (!isAdmin &&
                 bot.id !== userId &&
                 getRandomBoolean()) {
                 const pingpong = sayPingPong(config, text);
@@ -60,7 +61,6 @@ const roomJoins = roomIds.map(async (id) => {
                 return r.test(stripped) ? b : a;
             }, (() => ""));
             const response = await builder(config, text);
-            const isAdmin = config.isAdmin(userId);
             console.debug(`
             From:     ${userId}
             Name:     ${msg.userName}
