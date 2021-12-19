@@ -10,8 +10,8 @@ const asyncRequest = promisify(request);
  * @summary starts the bot server
  * @returns {Promise<Application>}
  */
-export const startServer = async (): Promise<Application> => {
-    const app = express().set("port", process.env.PORT || 5000);
+export const startServer = async (port?: number): Promise<Application> => {
+    const app = express().set("port", port || process.env.PORT || 5000);
 
     //see https://stackoverflow.com/a/59892173/11407695
     app.use(express.urlencoded({ extended: true }));
