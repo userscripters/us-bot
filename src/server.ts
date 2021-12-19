@@ -16,6 +16,8 @@ export const startServer = async (port?: number): Promise<Application> => {
     //see https://stackoverflow.com/a/59892173/11407695
     app.use(express.urlencoded({ extended: true }));
 
+    app.use(express.json({ strict: true }));
+
     app.use((_req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
         res.header(
