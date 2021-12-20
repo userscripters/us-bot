@@ -10,7 +10,7 @@ import {
     listProjectColumns,
     listProjects,
     moveUserscriptIdea,
-    sayManual,
+    sayManual
 } from "./commands.js";
 import { BotConfig } from "./config.js";
 import {
@@ -28,9 +28,10 @@ import {
     SHOW_HELP,
     WHO_ARE_YOU,
     WHO_MADE_ME,
-    WHO_WE_ARE,
+    WHO_WE_ARE
 } from "./expressions.js";
 import { isIgnoredUser, isSameRoom } from "./guards.js";
+import { startWebhookServer } from "./hooks/index.js";
 import {
     aliceUser,
     sayDefineWord,
@@ -41,7 +42,7 @@ import {
     sayWhoIAm,
     sayWhoMadeMe,
     sayWhoWeAre,
-    shootUser,
+    shootUser
 } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 import { stripLeadingMention } from "./utils/chat.js";
@@ -175,6 +176,8 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
 
         await startServer();
+
+        await startWebhookServer(room);
 
         if (config.isOnHeroku()) herokuKeepAlive(config.host);
 
