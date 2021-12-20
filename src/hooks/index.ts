@@ -1,6 +1,7 @@
 import type { PackageEvent, Schema } from "@octokit/webhooks-types";
 import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
+import type { Application } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
 import { uptime } from "process";
@@ -40,13 +41,13 @@ const verifyWebhookSecret = (
 /**
  * @summary starts a server listening to GitHub webhooks
  */
-export const startWebhookServer = async (room: Room, port = 5001) => {
+export const startWebhookServer = async (room: Room, port = 5001): Promise<Application | undefined> => {
     dotenv.config();
 
     const { GITHUB_WEBHOOK_SECRET } = process.env;
     if (!GITHUB_WEBHOOK_SECRET) {
         console.log(`no GitHub Webhook secret provided, skipping server`);
-        return false;
+        return;
     }
 
     const app = await startServer(port);
@@ -82,5 +83,5 @@ export const startWebhookServer = async (room: Room, port = 5001) => {
         return res.sendStatus(status ? 200 : 500);
     });
 
-    return true;
+    return app;
 };
