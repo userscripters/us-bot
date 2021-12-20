@@ -3,6 +3,7 @@ import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
+import { uptime } from "process";
 import { startServer } from "../server.js";
 import { handlePackageUpdate, makeIsPackageEvent } from "./packages.js";
 
@@ -39,15 +40,24 @@ const verifyWebhookSecret = (
 /**
  * @summary starts a server listening to GitHub webhooks
  */
-export const startWebhookServer = async (room: Room, port?: number) => {
+export const startWebhookServer = async (room: Room, port = 5001) => {
     dotenv.config();
 
     const { GITHUB_WEBHOOK_SECRET } = process.env;
-    if (!GITHUB_WEBHOOK_SECRET) return false;
+    if (!GITHUB_WEBHOOK_SECRET) {
+        console.log(`no GitHub Webhook secret provided, skipping server`);
+        return false;
+    }
 
-    const app = await startServer(port || 5001);
+    const app = await startServer(port);
 
     const hash = createHmac("sha256", GITHUB_WEBHOOK_SECRET);
+
+    app.get("/payload", (_req, res) => {
+        return res.send(`webhook server reporting for duty
+        Port:   ${port}
+        Uptime: ${uptime()}s`);
+    });
 
     /**
      * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks
@@ -56,6 +66,7 @@ export const startWebhookServer = async (room: Room, port?: number) => {
         const { headers, body } = req;
 
         if (!verifyWebhookSecret(headers, body, hash)) {
+            console.log("webhook: request signature does not match");
             return res.sendStatus(404);
         }
 
