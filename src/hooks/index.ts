@@ -2,6 +2,7 @@ import type { PackageEvent, Schema } from "@octokit/webhooks-types";
 import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
 import type { Application } from "express";
+import type { Server } from "http";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
 import { uptime } from "process";
@@ -41,7 +42,7 @@ const verifyWebhookSecret = (
 /**
  * @summary starts a server listening to GitHub webhooks
  */
-export const startWebhookServer = async (room: Room, port = 5001): Promise<Application | undefined> => {
+export const startWebhookServer = async (room: Room, port = 5001): Promise<[Application, Server] | undefined> => {
     dotenv.config();
 
     const { GITHUB_WEBHOOK_SECRET } = process.env;
@@ -50,7 +51,7 @@ export const startWebhookServer = async (room: Room, port = 5001): Promise<Appli
         return;
     }
 
-    const app = await startServer(port);
+    const [app, server] = await startServer(port);
 
     const hash = createHmac("sha256", GITHUB_WEBHOOK_SECRET);
 
@@ -83,5 +84,5 @@ export const startWebhookServer = async (room: Room, port = 5001): Promise<Appli
         return res.sendStatus(status ? 200 : 500);
     });
 
-    return app;
+    return [app, server];
 };

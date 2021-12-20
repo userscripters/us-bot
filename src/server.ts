@@ -10,7 +10,7 @@ const asyncRequest = promisify(request);
  * @summary starts the bot server
  * @returns {Promise<Application>}
  */
-export const startServer = async (port?: number): Promise<Application> => {
+export const startServer = async (port?: number): Promise<[Application, Server]> => {
     const app = express().set("port", port || process.env.PORT || 5000);
 
     //see https://stackoverflow.com/a/59892173/11407695
@@ -44,12 +44,12 @@ export const startServer = async (port?: number): Promise<Application> => {
         });
 
         rli.on("SIGINT", farewell);
-        return app;
+        return [app, server];
     }
 
     /** @see https://stackoverflow.com/a/14516195/11407695 */
     process.on("SIGINT", farewell);
-    return app;
+    return [app, server];
 };
 
 /**
