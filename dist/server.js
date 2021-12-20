@@ -24,10 +24,10 @@ export const startServer = async (port) => {
             output: process.stdout,
         });
         rli.on("SIGINT", farewell);
-        return app;
+        return [app, server];
     }
     process.on("SIGINT", farewell);
-    return app;
+    return [app, server];
 };
 export const herokuKeepAlive = (url, mins = 20) => {
     setInterval(async () => await asyncRequest(new URL(url)), mins * 6e4);

@@ -31,7 +31,7 @@ import {
     WHO_WE_ARE
 } from "./expressions.js";
 import { isIgnoredUser, isSameRoom } from "./guards.js";
-import { startWebhookServer } from "./hooks/index.js";
+import { addWebhookRoute } from "./hooks/index.js";
 import {
     aliceUser,
     sayDefineWord,
@@ -175,9 +175,9 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
         // Interval to keep-alive
         setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
 
-        await startServer();
+        const [app] = await startServer();
 
-        await startWebhookServer(room);
+        await addWebhookRoute(app,room);
 
         if (config.isOnHeroku()) herokuKeepAlive(config.host);
 

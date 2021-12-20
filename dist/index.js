@@ -6,7 +6,7 @@ import { addRepository, addUserscriptIdea, listCommands, listProjectColumns, lis
 import { BotConfig } from "./config.js";
 import { ADD_IDEA, ADD_REPO, ALICE_THEM, DEFINE_WORD, LIST_COLUMNS, LIST_COMMANDS, LIST_MEMBERS, LIST_PACKAGES, LIST_PROJECTS, MOVE_IDEA, SHOOT_THEM, SHOW_HELP, WHO_ARE_YOU, WHO_MADE_ME, WHO_WE_ARE } from "./expressions.js";
 import { isIgnoredUser, isSameRoom } from "./guards.js";
-import { startWebhookServer } from "./hooks/index.js";
+import { addWebhookRoute } from "./hooks/index.js";
 import { aliceUser, sayDefineWord, sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
 import { stripLeadingMention } from "./utils/chat.js";
@@ -83,8 +83,8 @@ const roomJoins = roomIds.map(async (id) => {
         });
         await room.watch();
         setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
-        await startServer();
-        await startWebhookServer(room);
+        const [app] = await startServer();
+        await addWebhookRoute(app, room);
         if (config.isOnHeroku())
             herokuKeepAlive(config.host);
         return { id, status: true };
