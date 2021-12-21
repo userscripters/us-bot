@@ -1,7 +1,7 @@
 import type { PackageEvent, Schema } from "@octokit/webhooks-types";
 import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
-import { Application } from "express";
+import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
 import { handlePackageUpdate, makeIsPackageEvent } from "./packages.js";
@@ -54,9 +54,9 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
      * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks
      */
     app.post("/payload", async (req, res) => {
-        const { headers, body } = req;
+        const { headers, body, raw } = req as Request & { raw: string; };
 
-        if (!verifyWebhookSecret(headers, body, hash)) {
+        if (!verifyWebhookSecret(headers, raw, hash)) {
             console.log("webhook: request signature does not match");
             return res.sendStatus(404);
         }

@@ -6,7 +6,14 @@ const asyncRequest = promisify(request);
 export const startServer = async (port) => {
     const app = express().set("port", port || process.env.PORT || 5000);
     app.use(express.urlencoded({ extended: true }));
-    app.use(express.json({ strict: true }));
+    app.use(express.json({
+        strict: true,
+        verify: (req, _res, buf, enc) => {
+            Object.defineProperty(req, "raw", {
+                value: buf.toString(enc)
+            });
+        }
+    }));
     app.use((_req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
         res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");

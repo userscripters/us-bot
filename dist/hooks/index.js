@@ -17,8 +17,8 @@ export const addWebhookRoute = async (app, room) => {
     }
     const hash = createHmac("sha256", GITHUB_WEBHOOK_SECRET);
     app.post("/payload", async (req, res) => {
-        const { headers, body } = req;
-        if (!verifyWebhookSecret(headers, body, hash)) {
+        const { headers, body, raw } = req;
+        if (!verifyWebhookSecret(headers, raw, hash)) {
             console.log("webhook: request signature does not match");
             return res.sendStatus(404);
         }

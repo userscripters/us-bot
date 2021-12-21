@@ -16,7 +16,15 @@ export const startServer = async (port?: number): Promise<[Application, Server]>
     //see https://stackoverflow.com/a/59892173/11407695
     app.use(express.urlencoded({ extended: true }));
 
-    app.use(express.json({ strict: true }));
+    app.use(express.json({
+        strict: true,
+        // https://gist.github.com/stigok/57d075c1cf2a609cb758898c0b202428
+        verify: (req, _res, buf, enc) => {
+            Object.defineProperty(req, "raw", {
+                value: buf.toString(enc as BufferEncoding)
+            });
+        }
+    }));
 
     app.use((_req, res, next) => {
         res.header("Access-Control-Allow-Origin", "*");
