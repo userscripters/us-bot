@@ -38,6 +38,8 @@ const verifyWebhookSecret = (
 
 /**
  * @summary forks a worker for processing GitHub webhook events
+ * @param app express application instance
+ * @param room ChatExchange room to pass to the handler
  */
 export const addWebhookRoute = async (app: Application, room: Room): Promise<void> => {
     dotenv.config();
