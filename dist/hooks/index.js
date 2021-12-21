@@ -2,7 +2,8 @@ import dotenv from "dotenv";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { handlePackageUpdate, makeIsPackageEvent } from "./packages.js";
 const verifyWebhookSecret = (headers, body, hash) => {
-    const signature = headers["X-Hub-Signature-256"];
+    console.log(headers);
+    const signature = headers["x-hub-signature-256"];
     if (!signature)
         return false;
     const computed = `sha256=${hash.update(body).digest("hex")}`;

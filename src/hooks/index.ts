@@ -25,7 +25,7 @@ const verifyWebhookSecret = (
     body: string,
     hash: Hmac
 ): boolean => {
-    const signature = headers["X-Hub-Signature-256"];
+    const signature = headers["x-hub-signature-256"];
     if (!signature) return false;
 
     const computed = `sha256=${hash.update(body).digest("hex")}`;
