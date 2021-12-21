@@ -1,6 +1,5 @@
 import type { PackageEvent, PackagePublishedEvent, PackageUpdatedEvent, Schema } from "@octokit/webhooks-types";
 import Room from "chatexchange/dist/Room";
-import { mdLink } from "../helpers.js";
 
 /**
  * @summary makes a PackageEvent payload guard
@@ -33,13 +32,16 @@ export const handlePackagePublished = async (room: Room, payload: PackagePublish
     const { version, html_url: versionUrl, author } = package_version;
     const { login: authorName, html_url: authorUrl } = author;
 
-    const template = `**new package version published**
-Package:   ${mdLink(packageUrl, name)}
-Version:   ${mdLink(versionUrl, version)}
-Authored:  ${mdLink(authorUrl, authorName)}
+    const template = `
+new package version published
+---------
+Package:   ${name} (${packageUrl})
+Version:   ${version} (${versionUrl})
+Authored:  ${authorName} (${authorUrl})
 Timestamp: ${updated_at}
 ---------
-Versioned by ${mdLink(senderUrl, senderName)}`;
+Versioned by ${senderName}
+${senderUrl}`;
 
     await room.sendMessage(template);
 
