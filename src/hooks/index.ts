@@ -68,7 +68,9 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
         ];
 
         const [, handler] = rules.find(([guard]) => guard(body)) || [];
-        if (!handler) return;
+        if (!handler) {
+            return res.status(200).send("no Webhook handler registered");
+        }
 
         const status = await handler(room, body);
 

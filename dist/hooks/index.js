@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { handlePackageUpdate, makeIsPackageEvent } from "./packages.js";
 const verifyWebhookSecret = (headers, body, hash) => {
-    console.log(headers);
     const signature = headers["x-hub-signature-256"];
     if (!signature)
         return false;
@@ -27,8 +26,9 @@ export const addWebhookRoute = async (app, room) => {
             [makeIsPackageEvent("updated"), handlePackageUpdate]
         ];
         const [, handler] = rules.find(([guard]) => guard(body)) || [];
-        if (!handler)
-            return;
+        if (!handler) {
+            return res.status(200).send("no Webhook handler registered");
+        }
         const status = await handler(room, body);
         return res.sendStatus(status ? 200 : 500);
     });
