@@ -23,7 +23,7 @@ export const makeIsPackageEvent =
  * @param room chat room the bot is listening to
  * @param payload "updated" package event payload
  */
-export const handlePackageUpdate = async (room: Room, payload: PackageUpdatedEvent) => {
+export const handlePackagePublished = async (room: Room, payload: PackagePublishedEvent) => {
 
     const {
         package: { updated_at, name, html_url: packageUrl, package_version },
@@ -36,7 +36,7 @@ export const handlePackageUpdate = async (room: Room, payload: PackageUpdatedEve
 
     const { login: authorName, html_url: authorUrl } = author;
 
-    const template = `**new package version**
+    const template = `**new package version published**
 Package:   ${mdLink(packageUrl, name)}
 Version:   ${version} | ${mdLink(releaseUrl, "release")}
 Authored:  ${mdLink(authorUrl, authorName)}

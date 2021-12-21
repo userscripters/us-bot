@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
-import { handlePackageUpdate, makeIsPackageEvent } from "./packages.js";
+import { handlePackagePublished, makeIsPackageEvent } from "./packages.js";
 
 
 
@@ -64,7 +64,7 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
         }
 
         const rules: PayloadHandlingRules<PackageEvent> = [
-            [makeIsPackageEvent("updated"), handlePackageUpdate]
+            [makeIsPackageEvent("published"), handlePackagePublished]
         ];
 
         const [, handler] = rules.find(([guard]) => guard(body)) || [];
