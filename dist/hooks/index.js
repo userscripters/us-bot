@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { handlePackagePublished, makeIsPackageEvent } from "./packages.js";
+import { handlePackagePublished, handlePullRequestOpened, makeEventGuard } from "./packages.js";
 const verifyWebhookSecret = (headers, body, hash) => {
     const signature = headers["x-hub-signature-256"];
     if (!signature)
@@ -23,7 +23,8 @@ export const addWebhookRoute = async (app, room) => {
             return res.sendStatus(404);
         }
         const rules = [
-            [makeIsPackageEvent("published"), handlePackagePublished]
+            [makeEventGuard("published"), handlePackagePublished],
+            [makeEventGuard("opened"), handlePullRequestOpened]
         ];
         const [, handler] = rules.find(([guard]) => guard(body)) || [];
         if (!handler) {

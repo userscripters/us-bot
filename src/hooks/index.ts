@@ -1,10 +1,10 @@
-import type { PackageEvent, Schema } from "@octokit/webhooks-types";
+import type { PackageEvent, PackagePublishedEvent, PullRequestEvent, PullRequestOpenedEvent, Schema } from "@octokit/webhooks-types";
 import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
 import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
-import { handlePackagePublished, makeIsPackageEvent } from "./packages.js";
+import { handlePackagePublished, handlePullRequestOpened, makeEventGuard } from "./packages.js";
 
 
 
@@ -63,8 +63,9 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
             return res.sendStatus(404);
         }
 
-        const rules: PayloadHandlingRules<PackageEvent> = [
-            [makeIsPackageEvent("published"), handlePackagePublished]
+        const rules: PayloadHandlingRules<PackageEvent | PullRequestEvent> = [
+            [makeEventGuard<PackagePublishedEvent>("published"), handlePackagePublished],
+            [makeEventGuard<PullRequestOpenedEvent>("opened"), handlePullRequestOpened]
         ];
 
         const [, handler] = rules.find(([guard]) => guard(body)) || [];

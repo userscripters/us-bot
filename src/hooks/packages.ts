@@ -46,3 +46,34 @@ ${senderUrl}`;
 
     return true;
 };
+
+/**
+ * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+ * @summary handles a pull request "opened" event
+ * @param room chat room the bot is listening to
+ */
+export const handlePullRequestOpened = async (room: Room, payload: PullRequestOpenedEvent) => {
+
+    const {
+        pull_request: { html_url: prUrl, title, user, body, created_at },
+        repository: { full_name }
+    } = payload;
+
+    const { login, html_url: userUrl } = user;
+
+    const template = `
+pull request opened
+---------
+Repository: ${full_name}
+PR URL:     ${prUrl}
+Title:      ${title}
+About:      ${body}
+Timestamp:  ${created_at}
+---------
+Opened by ${login} (${userUrl})
+    `;
+
+    await room.sendMessage(template);
+
+    return true;
+};
