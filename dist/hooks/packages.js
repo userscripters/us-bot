@@ -19,7 +19,12 @@ ${senderUrl}`;
 };
 export const handlePullRequestOpened = async (room, payload) => {
     const { pull_request: { html_url: prUrl, title, user, body, created_at }, repository: { full_name } } = payload;
-    const { login, html_url: userUrl } = user;
+    const { login, html_url: userUrl, id } = user;
+    const { DEPENDABOT_ID } = process.env;
+    if (DEPENDABOT_ID && +DEPENDABOT_ID === id) {
+        console.log("PR is opened by Dependabot, aborting");
+        return true;
+    }
     const template = `
 pull request opened
 ---------
