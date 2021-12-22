@@ -1,19 +1,18 @@
-import type { PackageEvent, PackagePublishedEvent, PackageUpdatedEvent, Schema } from "@octokit/webhooks-types";
+import type { PackagePublishedEvent, PullRequestOpenedEvent, Schema } from "@octokit/webhooks-types";
 import Room from "chatexchange/dist/Room";
 
 /**
- * @summary makes a PackageEvent payload guard
+ * @summary makes a GitHub webhook payload guard
  * @param action action type to check against
  */
-export const makeIsPackageEvent =
-    <T extends PackageEvent["action"]>(action: T) =>
+export const makeEventGuard =
+    <T extends Extract<Schema, { action: string; }>>(action: T["action"]) =>
         /**
-         * @summary checks if a payload is a package event payload
+         * @summary concrete event guard
          * @param payload payload to check
          */
-        (payload: Schema): payload is (T extends "updated" ? PackageUpdatedEvent : PackagePublishedEvent) =>
+        (payload: Schema): payload is T =>
             "action" in payload &&
-            "package" in payload &&
             payload.action === action;
 
 /**
