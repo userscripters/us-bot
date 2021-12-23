@@ -1,10 +1,10 @@
-import type { PackageEvent, PackagePublishedEvent, PullRequestEvent, PullRequestOpenedEvent, Schema } from "@octokit/webhooks-types";
+import type { PackageEvent, PackagePublishedEvent, PullRequestEvent, PullRequestOpenedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
 import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
 import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
-import { handlePackagePublished, handlePullRequestOpened, makeEventGuard } from "./packages.js";
+import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, makeEventGuard } from "./packages.js";
 
 
 
@@ -63,9 +63,21 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
             return res.sendStatus(404);
         }
 
-        const rules: PayloadHandlingRules<PackageEvent | PullRequestEvent> = [
+        const event = headers["x-github-event"] as string;
+
+        const eventMap = new Map([
+            ["push", handlePushedTag]
+        ]);
+
+        const eventHandler = eventMap.get(event);
+        if (eventHandler) {
+            const status = await eventHandler(room, body);
+            return res.sendStatus(status ? 200 : 500);
+        }
+
+        const rules: PayloadHandlingRules<PackageEvent | PullRequestEvent | PushEvent> = [
             [makeEventGuard<PackagePublishedEvent>("published"), handlePackagePublished],
-            [makeEventGuard<PullRequestOpenedEvent>("opened"), handlePullRequestOpened]
+            [makeEventGuard<PullRequestOpenedEvent>("opened"), handlePullRequestOpened],
         ];
 
         const [, handler] = rules.find(([guard]) => guard(body)) || [];

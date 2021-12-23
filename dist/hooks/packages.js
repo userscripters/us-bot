@@ -39,3 +39,44 @@ Opened by ${login} (${userUrl})
     await room.sendMessage(template);
     return true;
 };
+export const handlePushedTag = async (room, payload) => {
+    try {
+        const { pusher, head_commit, repository, created, deleted, forced, ref } = payload;
+        if (!ref.includes("/refs/tags/")) {
+            return true;
+        }
+        const { full_name, html_url: repoUrl } = repository;
+        const { message, timestamp, author, committer, id, added = [], removed = [], modified = [] } = head_commit || {};
+        const { name } = pusher;
+        const { username: authorName } = author || {};
+        const { username: committerName } = committer || {};
+        const actionMap = [
+            [created, "created"],
+            [deleted, "removed"]
+        ];
+        const [, action] = actionMap.find(([a]) => !!a) || [, "changed"];
+        const hash = id ? ` (#${id.slice(0, 8)})` : "";
+        const template = `
+${forced ? "force-" : ""}${action} a tag${hash}
+---------
+Repository: ${full_name} (${repoUrl})
+Message:    ${message || "unknown"}
+
+Stats:
+- ${added.length} added
+- ${removed.length} removed
+- ${modified.length} changed
+
+Authored:   ${authorName || "unknown"}
+Committed:  ${committerName || "unknown"}
+Timestamp:  ${timestamp || "unknown"}
+---------
+Pushed by ${name}`;
+        await room.sendMessage(template);
+        return true;
+    }
+    catch (error) {
+        console.warn(error);
+        return false;
+    }
+};

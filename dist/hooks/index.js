@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { createHmac, timingSafeEqual } from "node:crypto";
-import { handlePackagePublished, handlePullRequestOpened, makeEventGuard } from "./packages.js";
+import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, makeEventGuard } from "./packages.js";
 const verifyWebhookSecret = (headers, body, hash) => {
     const signature = headers["x-hub-signature-256"];
     if (!signature)
@@ -22,9 +22,18 @@ export const addWebhookRoute = async (app, room) => {
             console.log("webhook: request signature does not match");
             return res.sendStatus(404);
         }
+        const event = headers["x-github-event"];
+        const eventMap = new Map([
+            ["push", handlePushedTag]
+        ]);
+        const eventHandler = eventMap.get(event);
+        if (eventHandler) {
+            const status = await eventHandler(room, body);
+            return res.sendStatus(status ? 200 : 500);
+        }
         const rules = [
             [makeEventGuard("published"), handlePackagePublished],
-            [makeEventGuard("opened"), handlePullRequestOpened]
+            [makeEventGuard("opened"), handlePullRequestOpened],
         ];
         const [, handler] = rules.find(([guard]) => guard(body)) || [];
         if (!handler) {
