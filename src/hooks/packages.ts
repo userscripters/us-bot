@@ -1,4 +1,4 @@
-import type { PackagePublishedEvent, PullRequestOpenedEvent, Schema } from "@octokit/webhooks-types";
+import type { PackagePublishedEvent, PullRequestOpenedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
 import Room from "chatexchange/dist/Room";
 
 /**
@@ -82,4 +82,66 @@ Opened by ${login} (${userUrl})
     await room.sendMessage(template);
 
     return true;
+};
+
+/**
+ * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
+ * @summary handles a "push" event (tags only)
+ * @param room chat room the bot is listening to
+ * @param payload event payload
+ */
+export const handlePushedTag = async (room: Room, payload: PushEvent) => {
+    try {
+        const { pusher, head_commit, repository, created, deleted, forced, ref } = payload;
+
+        if (!ref.includes("/refs/tags/")) {
+            return true;
+        }
+
+        const { full_name, html_url: repoUrl } = repository;
+
+        const {
+            message, timestamp, author, committer, id,
+            added = [], removed = [], modified = []
+        } = head_commit || {};
+
+        const { name } = pusher;
+
+        const { username: authorName } = author || {};
+        const { username: committerName } = committer || {};
+
+        const actionMap: [boolean, string][] = [
+            [created, "created"],
+            [deleted, "removed"]
+        ];
+
+        const [, action] = actionMap.find(([a]) => !!a) || [, "changed"];
+
+        const hash = id ? ` (#${id.slice(0, 8)})` : "";
+
+        const template = `
+${forced ? "force-" : ""}${action} a tag${hash}
+---------
+Repository: ${full_name} (${repoUrl})
+Message:    ${message || "unknown"}
+
+Stats:
+- ${added.length} added
+- ${removed.length} removed
+- ${modified.length} changed
+
+Authored:   ${authorName || "unknown"}
+Committed:  ${committerName || "unknown"}
+Timestamp:  ${timestamp || "unknown"}
+---------
+Pushed by ${name}`;
+
+        await room.sendMessage(template);
+
+        return true;
+
+    } catch (error) {
+        console.warn(error);
+        return false;
+    }
 };
