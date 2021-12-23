@@ -1,10 +1,11 @@
 import dotenv from "dotenv";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, makeEventGuard } from "./packages.js";
-const verifyWebhookSecret = (headers, body, hash) => {
+const verifyWebhookSecret = (headers, body, secret) => {
     const signature = headers["x-hub-signature-256"];
     if (!signature)
         return false;
+    const hash = createHmac("sha256", secret);
     const computed = `sha256=${hash.update(body).digest("hex")}`;
     return timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
 };
@@ -15,10 +16,9 @@ export const addWebhookRoute = async (app, room) => {
         console.log(`no GitHub Webhook secret provided, skipping server`);
         return;
     }
-    const hash = createHmac("sha256", GITHUB_WEBHOOK_SECRET);
     app.post("/payload", async (req, res) => {
         const { headers, body, raw } = req;
-        if (!verifyWebhookSecret(headers, raw, hash)) {
+        if (!verifyWebhookSecret(headers, raw, GITHUB_WEBHOOK_SECRET)) {
             console.log("webhook: request signature does not match");
             return res.sendStatus(404);
         }

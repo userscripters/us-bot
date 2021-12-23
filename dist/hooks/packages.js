@@ -43,6 +43,7 @@ export const handlePushedTag = async (room, payload) => {
     try {
         const { pusher, head_commit, repository, created, deleted, forced, ref } = payload;
         if (!ref.includes("/refs/tags/")) {
+            console.log(`got a push event, not a tag push: ${ref}`);
             return true;
         }
         const { full_name, html_url: repoUrl } = repository;

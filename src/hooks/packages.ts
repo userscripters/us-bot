@@ -95,6 +95,7 @@ export const handlePushedTag = async (room: Room, payload: PushEvent) => {
         const { pusher, head_commit, repository, created, deleted, forced, ref } = payload;
 
         if (!ref.includes("/refs/tags/")) {
+            console.log(`got a push event, not a tag push: ${ref}`);
             return true;
         }
 
