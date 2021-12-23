@@ -56,21 +56,18 @@ export const handlePushedTag = async (room, payload) => {
             [deleted, "removed"]
         ];
         const [, action] = actionMap.find(([a]) => !!a) || [, "changed"];
-        const hash = id ? ` (#${id.slice(0, 8)})` : "";
+        const hash = id ? ` (#${id.slice(0, 7)})` : "";
+        const commitStats = deleted ? `Ref: ${ref}` : `Message: ${message || "unknown"}
+Stats: ${added.length} added, ${removed.length} removed, ${modified.length} changed
+
+Authored:   ${authorName || "unknown"}
+Committed:  ${committerName || "unknown"}
+Timestamp:  ${timestamp || "unknown"}`;
         const template = `
 ${forced ? "force-" : ""}${action} a tag${hash}
 ---------
 Repository: ${full_name} (${repoUrl})
-Message:    ${message || "unknown"}
-
-Stats:
-- ${added.length} added
-- ${removed.length} removed
-- ${modified.length} changed
-
-Authored:   ${authorName || "unknown"}
-Committed:  ${committerName || "unknown"}
-Timestamp:  ${timestamp || "unknown"}
+${commitStats}
 ---------
 Pushed by ${name}`;
         await room.sendMessage(template);
