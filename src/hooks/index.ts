@@ -3,7 +3,7 @@ import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
 import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
-import { createHmac, timingSafeEqual, type Hmac } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, makeEventGuard } from "./packages.js";
 
 
@@ -18,16 +18,17 @@ type PayloadHandlingRules<T extends Schema> = {
  * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/securing-your-webhooks
  * @param headers incoming HTTP headers
  * @param body request body to check
- * @param hash HMAC to compare with
+ * @param secret secret to compute HMAC with
  */
 const verifyWebhookSecret = (
     headers: IncomingHttpHeaders,
     body: string,
-    hash: Hmac
+    secret: string
 ): boolean => {
     const signature = headers["x-hub-signature-256"];
     if (!signature) return false;
 
+    const hash = createHmac("sha256", secret);
     const computed = `sha256=${hash.update(body).digest("hex")}`;
 
     return timingSafeEqual(
@@ -50,15 +51,13 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
         return;
     }
 
-    const hash = createHmac("sha256", GITHUB_WEBHOOK_SECRET);
-
     /**
      * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/creating-webhooks
      */
     app.post("/payload", async (req, res) => {
         const { headers, body, raw } = req as Request & { raw: string; };
 
-        if (!verifyWebhookSecret(headers, raw, hash)) {
+        if (!verifyWebhookSecret(headers, raw, GITHUB_WEBHOOK_SECRET)) {
             console.log("webhook: request signature does not match");
             return res.sendStatus(404);
         }
