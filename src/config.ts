@@ -9,6 +9,8 @@ export class BotConfig extends EventEmitter {
 
     public throttles: Map<string, number> = new Map();
 
+    public gitHubToChatUsers: Map<number, number> = new Map();
+
     public org: string;
 
     public host: string;
@@ -24,6 +26,7 @@ export class BotConfig extends EventEmitter {
         EMAIL = "",
         PASSWORD = "",
         THROTTLES = "{}",
+        GITHUB_TO_CHAT_USERS = "[]",
         ORG_NAME,
     }: NodeJS.ProcessEnv) {
         super();
@@ -38,6 +41,11 @@ export class BotConfig extends EventEmitter {
         const parsed: Record<string, string> = JSON.parse(THROTTLES);
         Object.entries(parsed).forEach(([id, throttle]) => {
             this.throttles.set(id, +throttle);
+        });
+
+        const userMap: [number, number][] = JSON.parse(GITHUB_TO_CHAT_USERS);
+        userMap.forEach(([ghId, chatId]) => {
+            this.gitHubToChatUsers.set(ghId, chatId);
         });
     }
 

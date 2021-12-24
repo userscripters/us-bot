@@ -1,19 +1,22 @@
-import type { PackageEvent, PackagePublishedEvent, PullRequestEvent, PullRequestOpenedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
+import type { PackagePublishedEvent, PullRequestOpenedEvent, PullRequestReviewRequestedEvent, Schema } from "@octokit/webhooks-types";
 import type Room from "chatexchange/dist/Room";
 import dotenv from "dotenv";
 import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import type Queue from "p-queue";
-import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, makeEventGuard } from "./packages.js";
+import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, handleReviewRequested, makeEventGuard } from "./packages.js";
 
+type Intersect<T> = (T extends any ? (a: T) => void : never) extends ((a: infer U) => void) ? U : never;
 
+type SupportedEvents =
+    | PullRequestOpenedEvent
+    | PackagePublishedEvent
+    | PullRequestReviewRequestedEvent;
 
-type PayloadHandlingRule<T extends Schema> = [guard: (p: Schema) => p is T, handler: (q: Queue, r: Room, p: T) => Promise<boolean>];
-
-type PayloadHandlingRules<T extends Schema> = {
-    [P in T as string]: PayloadHandlingRule<P>
-}[string][];
+type PayloadHandlerMap = Intersect<{
+    [P in SupportedEvents as string]: Map<(p: Schema) => boolean, (q: Queue, r: Room, p: P) => Promise<boolean>>
+}[string]>;
 
 /**
  * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/securing-your-webhooks
@@ -76,12 +79,12 @@ export const addWebhookRoute = async (app: Application, queue: Queue, room: Room
             return res.sendStatus(status ? 200 : 500);
         }
 
-        const rules: PayloadHandlingRules<PackageEvent | PullRequestEvent | PushEvent> = [
-            [makeEventGuard<PackagePublishedEvent>("published"), handlePackagePublished],
-            [makeEventGuard<PullRequestOpenedEvent>("opened"), handlePullRequestOpened],
-        ];
+        const rules: PayloadHandlerMap = new Map();
+        rules.set(makeEventGuard("published"), handlePackagePublished);
+        rules.set(makeEventGuard("opened"), handlePullRequestOpened);
+        rules.set(makeEventGuard("review_requested"), handleReviewRequested);
 
-        const [, handler] = rules.find(([guard]) => guard(body)) || [];
+        const [, handler] = [...rules].find(([guard]) => guard(body)) || [];
         if (!handler) {
             return res.status(200).send("no Webhook handler registered");
         }

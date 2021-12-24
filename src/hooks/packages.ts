@@ -1,4 +1,4 @@
-import type { PackagePublishedEvent, PullRequestOpenedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
+import type { PackagePublishedEvent, PullRequestOpenedEvent, PullRequestReviewRequestedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
 import Room from "chatexchange/dist/Room";
 import type Queue from "p-queue";
 import { sendMultipartMessage } from "../utils/chat.js";
@@ -139,6 +139,57 @@ Repository: ${full_name} (${repoUrl})
 ${commitStats}
 ---------
 Pushed by ${name}`;
+
+        sendMultipartMessage(queue, room, template, 500);
+
+        return true;
+
+    } catch (error) {
+        console.warn(error);
+        return false;
+    }
+};
+
+/**
+ * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
+ * @summary handles a "pull_request" event (review requested only)
+ * @param queue message queue instance
+ * @param room chat room the bot is listening to
+ * @param payload event payload
+ */
+export const handleReviewRequested = async (queue: Queue, room: Room, payload: PullRequestReviewRequestedEvent) => {
+    try {
+        const {
+            repository: { full_name, html_url: repoUrl },
+            pull_request: { html_url: prUrl, title, user, requested_reviewers },
+            sender: { login: requesterName, html_url: requesterUrl }
+        } = payload;
+
+        const { login, html_url: userUrl } = user;
+
+        // TODO: pass bot config to the handler
+        const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
+        const uidMap: Map<number, string> = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
+
+        const reviewers = requested_reviewers.map(({ html_url, name, id }) => {
+            const mention = uidMap.has(id) ? `@${uidMap.get(id)}` : `(${html_url})`;
+            return `-${name} ${mention}`;
+        });
+
+        const template = `
+review request added
+---------
+Repository: ${full_name} (${repoUrl})
+PR URL:     ${prUrl}
+Title:      ${title}
+
+${requesterName} (${requesterUrl})
+requested review from:
+${reviewers.join("\n")}
+
+---------
+Opened by ${login} (${userUrl})
+`;
 
         sendMultipartMessage(queue, room, template, 500);
 

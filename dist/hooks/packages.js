@@ -79,3 +79,35 @@ Pushed by ${name}`;
         return false;
     }
 };
+export const handleReviewRequested = async (queue, room, payload) => {
+    try {
+        const { repository: { full_name, html_url: repoUrl }, pull_request: { html_url: prUrl, title, user, requested_reviewers }, sender: { login: requesterName, html_url: requesterUrl } } = payload;
+        const { login, html_url: userUrl } = user;
+        const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
+        const uidMap = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
+        const reviewers = requested_reviewers.map(({ html_url, name, id }) => {
+            const mention = uidMap.has(id) ? `@${uidMap.get(id)}` : `(${html_url})`;
+            return `-${name} ${mention}`;
+        });
+        const template = `
+review request added
+---------
+Repository: ${full_name} (${repoUrl})
+PR URL:     ${prUrl}
+Title:      ${title}
+
+${requesterName} (${requesterUrl})
+requested review from:
+${reviewers.join("\n")}
+
+---------
+Opened by ${login} (${userUrl})
+`;
+        sendMultipartMessage(queue, room, template, 500);
+        return true;
+    }
+    catch (error) {
+        console.warn(error);
+        return false;
+    }
+};

@@ -13,11 +13,12 @@ var _BotConfig_email, _BotConfig_password, _BotConfig_admins;
 import EventEmitter from "events";
 import { splitENV } from "./helpers.js";
 export class BotConfig extends EventEmitter {
-    constructor({ HOST = "", ADMIN_IDS, ROOM_IDS, EMAIL = "", PASSWORD = "", THROTTLES = "{}", ORG_NAME, }) {
+    constructor({ HOST = "", ADMIN_IDS, ROOM_IDS, EMAIL = "", PASSWORD = "", THROTTLES = "{}", GITHUB_TO_CHAT_USERS = "[]", ORG_NAME, }) {
         super();
         this.roomIds = [];
         this.logLevel = "default";
         this.throttles = new Map();
+        this.gitHubToChatUsers = new Map();
         _BotConfig_email.set(this, void 0);
         _BotConfig_password.set(this, void 0);
         _BotConfig_admins.set(this, new Set());
@@ -30,6 +31,10 @@ export class BotConfig extends EventEmitter {
         const parsed = JSON.parse(THROTTLES);
         Object.entries(parsed).forEach(([id, throttle]) => {
             this.throttles.set(id, +throttle);
+        });
+        const userMap = JSON.parse(GITHUB_TO_CHAT_USERS);
+        userMap.forEach(([ghId, chatId]) => {
+            this.gitHubToChatUsers.set(ghId, chatId);
         });
     }
     isAdmin(idOrUser) {
