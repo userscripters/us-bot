@@ -1,6 +1,7 @@
+import { sendMultipartMessage } from "../utils/chat.js";
 export const makeEventGuard = (action) => (payload) => "action" in payload &&
     payload.action === action;
-export const handlePackagePublished = async (room, payload) => {
+export const handlePackagePublished = async (queue, room, payload) => {
     const { package: { updated_at, name, html_url: packageUrl, package_version }, sender: { login: senderName, html_url: senderUrl } } = payload;
     const { version, html_url: versionUrl, author } = package_version;
     const { login: authorName, html_url: authorUrl } = author;
@@ -14,10 +15,10 @@ Timestamp: ${updated_at}
 ---------
 Versioned by ${senderName}
 ${senderUrl}`;
-    await room.sendMessage(template);
+    sendMultipartMessage(queue, room, template, 500);
     return true;
 };
-export const handlePullRequestOpened = async (room, payload) => {
+export const handlePullRequestOpened = async (queue, room, payload) => {
     const { pull_request: { html_url: prUrl, title, user, body, created_at }, repository: { full_name } } = payload;
     const { login, html_url: userUrl, id } = user;
     const { DEPENDABOT_ID } = process.env;
@@ -36,10 +37,10 @@ Timestamp:  ${created_at}
 ---------
 Opened by ${login} (${userUrl})
     `;
-    await room.sendMessage(template);
+    sendMultipartMessage(queue, room, template, 500);
     return true;
 };
-export const handlePushedTag = async (room, payload) => {
+export const handlePushedTag = async (queue, room, payload) => {
     try {
         const { pusher, head_commit, repository, created, deleted, forced, ref } = payload;
         if (!ref.includes("refs/tags/")) {
@@ -70,7 +71,7 @@ Repository: ${full_name} (${repoUrl})
 ${commitStats}
 ---------
 Pushed by ${name}`;
-        await room.sendMessage(template);
+        sendMultipartMessage(queue, room, template, 500);
         return true;
     }
     catch (error) {

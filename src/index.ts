@@ -45,7 +45,7 @@ import {
     shootUser
 } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
-import { stripLeadingMention } from "./utils/chat.js";
+import { sendMultipartMessage, stripLeadingMention } from "./utils/chat.js";
 import { getRandomBoolean } from "./utils/random.js";
 
 type JoinStatus = {
@@ -154,20 +154,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
                 return;
             }
 
-            const maxChars = 500;
-
-            const messages = response
-                .split(
-                    new RegExp(
-                        `(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|\\s|$)`,
-                        "gm"
-                    )
-                )
-                .filter(Boolean);
-
-            for (const message of messages) {
-                queue.add(() => room.sendMessage(message));
-            }
+            sendMultipartMessage(queue, room, response, 500);
         });
 
         await room.watch();
@@ -177,7 +164,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
         const [app] = await startServer();
 
-        await addWebhookRoute(app,room);
+        await addWebhookRoute(app, queue, room);
 
         if (config.isOnHeroku()) herokuKeepAlive(config.host);
 

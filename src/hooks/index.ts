@@ -4,11 +4,12 @@ import dotenv from "dotenv";
 import { Application, Request } from "express";
 import type { IncomingHttpHeaders } from "http2";
 import { createHmac, timingSafeEqual } from "node:crypto";
+import type Queue from "p-queue";
 import { handlePackagePublished, handlePullRequestOpened, handlePushedTag, makeEventGuard } from "./packages.js";
 
 
 
-type PayloadHandlingRule<T extends Schema> = [guard: (p: Schema) => p is T, handler: (r: Room, p: T) => Promise<boolean>];
+type PayloadHandlingRule<T extends Schema> = [guard: (p: Schema) => p is T, handler: (q: Queue, r: Room, p: T) => Promise<boolean>];
 
 type PayloadHandlingRules<T extends Schema> = {
     [P in T as string]: PayloadHandlingRule<P>
@@ -40,9 +41,10 @@ const verifyWebhookSecret = (
 /**
  * @summary forks a worker for processing GitHub webhook events
  * @param app express application instance
+ * @param queue message queue instance
  * @param room ChatExchange room to pass to the handler
  */
-export const addWebhookRoute = async (app: Application, room: Room): Promise<void> => {
+export const addWebhookRoute = async (app: Application, queue: Queue, room: Room): Promise<void> => {
     dotenv.config();
 
     const { GITHUB_WEBHOOK_SECRET } = process.env;
@@ -70,7 +72,7 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
 
         const eventHandler = eventMap.get(event);
         if (eventHandler) {
-            const status = await eventHandler(room, body);
+            const status = await eventHandler(queue, room, body);
             return res.sendStatus(status ? 200 : 500);
         }
 
@@ -84,7 +86,7 @@ export const addWebhookRoute = async (app: Application, room: Room): Promise<voi
             return res.status(200).send("no Webhook handler registered");
         }
 
-        const status = await handler(room, body);
+        const status = await handler(queue, room, body);
 
         return res.sendStatus(status ? 200 : 500);
     });

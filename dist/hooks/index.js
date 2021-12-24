@@ -9,7 +9,7 @@ const verifyWebhookSecret = (headers, body, secret) => {
     const computed = `sha256=${hash.update(body).digest("hex")}`;
     return timingSafeEqual(Buffer.from(signature), Buffer.from(computed));
 };
-export const addWebhookRoute = async (app, room) => {
+export const addWebhookRoute = async (app, queue, room) => {
     dotenv.config();
     const { GITHUB_WEBHOOK_SECRET } = process.env;
     if (!GITHUB_WEBHOOK_SECRET) {
@@ -28,7 +28,7 @@ export const addWebhookRoute = async (app, room) => {
         ]);
         const eventHandler = eventMap.get(event);
         if (eventHandler) {
-            const status = await eventHandler(room, body);
+            const status = await eventHandler(queue, room, body);
             return res.sendStatus(status ? 200 : 500);
         }
         const rules = [
@@ -39,7 +39,7 @@ export const addWebhookRoute = async (app, room) => {
         if (!handler) {
             return res.status(200).send("no Webhook handler registered");
         }
-        const status = await handler(room, body);
+        const status = await handler(queue, room, body);
         return res.sendStatus(status ? 200 : 500);
     });
 };

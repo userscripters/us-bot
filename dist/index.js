@@ -9,7 +9,7 @@ import { isIgnoredUser, isSameRoom } from "./guards.js";
 import { addWebhookRoute } from "./hooks/index.js";
 import { aliceUser, sayDefineWord, sayMaster, sayPingPong, sayWhatAreOurPackages, sayWhoAreOurMemebers, sayWhoIAm, sayWhoMadeMe, sayWhoWeAre, shootUser } from "./messages.js";
 import { herokuKeepAlive, startServer } from "./server.js";
-import { stripLeadingMention } from "./utils/chat.js";
+import { sendMultipartMessage, stripLeadingMention } from "./utils/chat.js";
 import { getRandomBoolean } from "./utils/random.js";
 dotenv.config();
 const config = new BotConfig(process.env);
@@ -73,18 +73,12 @@ const roomJoins = roomIds.map(async (id) => {
                 room.sendMessage(sayMaster(config, text));
                 return;
             }
-            const maxChars = 500;
-            const messages = response
-                .split(new RegExp(`(^(?:.|\\n|\\r){1,${maxChars}})(?:\\n|\\s|$)`, "gm"))
-                .filter(Boolean);
-            for (const message of messages) {
-                queue.add(() => room.sendMessage(message));
-            }
+            sendMultipartMessage(queue, room, response, 500);
         });
         await room.watch();
         setInterval(async () => await client.joinRoom(room.id), 5 * 6e4);
         const [app] = await startServer();
-        await addWebhookRoute(app, room);
+        await addWebhookRoute(app, queue, room);
         if (config.isOnHeroku())
             herokuKeepAlive(config.host);
         return { id, status: true };

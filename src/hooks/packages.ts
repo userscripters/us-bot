@@ -1,5 +1,7 @@
 import type { PackagePublishedEvent, PullRequestOpenedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
 import Room from "chatexchange/dist/Room";
+import type Queue from "p-queue";
+import { sendMultipartMessage } from "../utils/chat.js";
 
 /**
  * @summary makes a GitHub webhook payload guard
@@ -18,10 +20,11 @@ export const makeEventGuard =
 /**
  * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#package
  * @summary handles the package "updated" event
+ * @param queue message queue instance
  * @param room chat room the bot is listening to
  * @param payload "updated" package event payload
  */
-export const handlePackagePublished = async (room: Room, payload: PackagePublishedEvent) => {
+export const handlePackagePublished = async (queue: Queue, room: Room, payload: PackagePublishedEvent) => {
 
     const {
         package: { updated_at, name, html_url: packageUrl, package_version },
@@ -42,7 +45,7 @@ Timestamp: ${updated_at}
 Versioned by ${senderName}
 ${senderUrl}`;
 
-    await room.sendMessage(template);
+    sendMultipartMessage(queue, room, template, 500);
 
     return true;
 };
@@ -50,9 +53,10 @@ ${senderUrl}`;
 /**
  * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#pull_request
  * @summary handles a pull request "opened" event
+ * @param queue message queue instance
  * @param room chat room the bot is listening to
  */
-export const handlePullRequestOpened = async (room: Room, payload: PullRequestOpenedEvent) => {
+export const handlePullRequestOpened = async (queue: Queue, room: Room, payload: PullRequestOpenedEvent) => {
 
     const {
         pull_request: { html_url: prUrl, title, user, body, created_at },
@@ -79,7 +83,7 @@ Timestamp:  ${created_at}
 Opened by ${login} (${userUrl})
     `;
 
-    await room.sendMessage(template);
+    sendMultipartMessage(queue, room, template, 500);
 
     return true;
 };
@@ -87,10 +91,11 @@ Opened by ${login} (${userUrl})
 /**
  * @see https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
  * @summary handles a "push" event (tags only)
+ * @param queue message queue instance
  * @param room chat room the bot is listening to
  * @param payload event payload
  */
-export const handlePushedTag = async (room: Room, payload: PushEvent) => {
+export const handlePushedTag = async (queue: Queue, room: Room, payload: PushEvent) => {
     try {
         const { pusher, head_commit, repository, created, deleted, forced, ref } = payload;
 
@@ -135,7 +140,7 @@ ${commitStats}
 ---------
 Pushed by ${name}`;
 
-        await room.sendMessage(template);
+        sendMultipartMessage(queue, room, template, 500);
 
         return true;
 
