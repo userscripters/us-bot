@@ -32,10 +32,7 @@ export class BotConfig extends EventEmitter {
         Object.entries(parsed).forEach(([id, throttle]) => {
             this.throttles.set(id, +throttle);
         });
-        const userMap = JSON.parse(GITHUB_TO_CHAT_USERS);
-        userMap.forEach(([ghId, chatId]) => {
-            this.gitHubToChatUsers.set(ghId, chatId);
-        });
+        this.gitHubToChatUsers = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
     }
     isAdmin(idOrUser) {
         const uid = typeof idOrUser === "number" ? idOrUser : idOrUser.id;

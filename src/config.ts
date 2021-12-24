@@ -9,7 +9,7 @@ export class BotConfig extends EventEmitter {
 
     public throttles: Map<string, number> = new Map();
 
-    public gitHubToChatUsers: Map<number, number> = new Map();
+    public gitHubToChatUsers: Map<number, string> = new Map();
 
     public org: string;
 
@@ -43,10 +43,7 @@ export class BotConfig extends EventEmitter {
             this.throttles.set(id, +throttle);
         });
 
-        const userMap: [number, number][] = JSON.parse(GITHUB_TO_CHAT_USERS);
-        userMap.forEach(([ghId, chatId]) => {
-            this.gitHubToChatUsers.set(ghId, chatId);
-        });
+        this.gitHubToChatUsers = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
     }
 
     isAdmin(idOrUser: number | User) {
