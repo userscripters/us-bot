@@ -171,9 +171,15 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
         const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
         const uidMap: Map<number, string> = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
 
-        const reviewers = requested_reviewers.map(({ html_url, name, id }) => {
+        const reviewers = requested_reviewers.map((reviewer) => {
+            const { html_url, id } = reviewer;
+
+            const isTeam = "name" in reviewer;
+            const username = isTeam ? reviewer.name : reviewer.login;
+            const teamPfx = isTeam ? `[team] ` : "";
+
             const mention = uidMap.has(id) ? `@${uidMap.get(id)}` : `(${html_url})`;
-            return `-${name} ${mention}`;
+            return `-${teamPfx}${username} ${mention}`;
         });
 
         const template = `
@@ -186,10 +192,8 @@ Title:      ${title}
 ${requesterName} (${requesterUrl})
 requested review from:
 ${reviewers.join("\n")}
-
 ---------
-Opened by ${login} (${userUrl})
-`;
+Opened by ${login} (${userUrl})`;
 
         sendMultipartMessage(queue, room, template, 500);
 
