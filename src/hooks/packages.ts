@@ -163,7 +163,7 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
         const {
             repository: { full_name, html_url: repoUrl },
             pull_request: { html_url: prUrl, title, user, number },
-            sender: { login: requesterName, html_url: requesterUrl, id: requesterId }
+            sender: { login: requesterName, html_url: requesterUrl }
         } = payload;
 
         const { login, html_url: userUrl } = user;
@@ -172,7 +172,7 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
         const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
         const uidMap: Map<number, string> = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
 
-        const reviewerIds: Set<number> = new Set([requesterId]);
+        const reviewerIds: Set<number> = new Set();
 
         const requested = "requested_reviewer" in payload ?
             payload.requested_reviewer :

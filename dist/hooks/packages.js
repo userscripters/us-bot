@@ -82,11 +82,11 @@ Pushed by ${name}`;
 };
 export const handleReviewRequested = async (queue, room, payload) => {
     try {
-        const { repository: { full_name, html_url: repoUrl }, pull_request: { html_url: prUrl, title, user, number }, sender: { login: requesterName, html_url: requesterUrl, id: requesterId } } = payload;
+        const { repository: { full_name, html_url: repoUrl }, pull_request: { html_url: prUrl, title, user, number }, sender: { login: requesterName, html_url: requesterUrl } } = payload;
         const { login, html_url: userUrl } = user;
         const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
         const uidMap = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
-        const reviewerIds = new Set([requesterId]);
+        const reviewerIds = new Set();
         const requested = "requested_reviewer" in payload ?
             payload.requested_reviewer :
             payload.requested_team;
