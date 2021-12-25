@@ -3,7 +3,7 @@
 
 | Author       | Oleg Valter<br>[oleg.a.valter@gmail.com](mailto:oleg.a.valter@gmail.com) |
 | :----------- | :----------------------- |
-| Contributors | Scratte<br>[https://stackoverflow.com/users/12695027/scratte](https://stackoverflow.com/users/12695027/scratte) |
+| Contributors | double-beep<br>[https://github.com/double-beep](https://github.com/double-beep)<br>Scratte<br>[https://stackoverflow.com/users/12695027/scratte](https://stackoverflow.com/users/12695027/scratte) |
 | Name | Us-bot |
 | Description | UserScripters chatroom bot |
 | License | [GPL-3.0-or-later](https://spdx.org/licenses/GPL-3.0-or-later) |
