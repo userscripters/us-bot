@@ -162,7 +162,7 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
         const {
             repository: { full_name, html_url: repoUrl },
             pull_request: { html_url: prUrl, title, user, requested_reviewers },
-            sender: { login: requesterName, html_url: requesterUrl }
+            sender: { login: requesterName, html_url: requesterUrl, id: requesterId }
         } = payload;
 
         const { login, html_url: userUrl } = user;
@@ -182,6 +182,10 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
             return `-${teamPfx}${username} ${mention}`;
         });
 
+        const mention = uidMap.has(requesterId) ?
+            `@${uidMap.get(requesterId)}` :
+            `(${requesterUrl})`;
+
         const template = `
 review request added
 ---------
@@ -189,7 +193,7 @@ Repository: ${full_name} (${repoUrl})
 PR URL:     ${prUrl}
 Title:      ${title}
 
-${requesterName} (${requesterUrl})
+${requesterName} ${mention}
 requested review from:
 ${reviewers.join("\n")}
 ---------
