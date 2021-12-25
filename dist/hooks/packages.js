@@ -1,3 +1,4 @@
+import { mdLink } from "../helpers.js";
 import { sendMultipartMessage } from "../utils/chat.js";
 export const makeEventGuard = (action) => (payload) => "action" in payload &&
     payload.action === action;
@@ -81,23 +82,21 @@ Pushed by ${name}`;
 };
 export const handleReviewRequested = async (queue, room, payload) => {
     try {
-        const { repository: { full_name, html_url: repoUrl }, pull_request: { html_url: prUrl, title, user, requested_reviewers }, sender: { login: requesterName, html_url: requesterUrl, id: requesterId } } = payload;
+        const { repository: { full_name, html_url: repoUrl }, pull_request: { html_url: prUrl, title, user, requested_reviewers, number }, sender: { login: requesterName, html_url: requesterUrl, id: requesterId } } = payload;
         const { login, html_url: userUrl } = user;
         const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
         const uidMap = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
+        const reviewerIds = new Set([requesterId]);
         const reviewers = requested_reviewers.map((reviewer) => {
             const { html_url, id } = reviewer;
+            reviewerIds.add(id);
             const isTeam = "name" in reviewer;
             const username = isTeam ? reviewer.name : reviewer.login;
             const teamPfx = isTeam ? `[team] ` : "";
-            const mention = uidMap.has(id) ? `@${uidMap.get(id)}` : `(${html_url})`;
-            return `- ${teamPfx}${username} ${mention}`;
+            return `${teamPfx}${username} (${html_url})`;
         });
-        const mention = uidMap.has(requesterId) ?
-            `@${uidMap.get(requesterId)}` :
-            `(${requesterUrl})`;
         const template = `
-${requesterName} ${mention}
+${requesterName} (${requesterUrl})
 requested review from:
 ${reviewers.join("\n")}
 ---------
@@ -107,6 +106,16 @@ Title:      ${title}
 ---------
 Opened by ${login} (${userUrl})`;
         sendMultipartMessage(queue, room, template, 500);
+        const cc = [];
+        reviewerIds.forEach((id) => {
+            if (!uidMap.has(id))
+                return;
+            cc.push(`@${uidMap.get(id)}`);
+        });
+        if (cc.length) {
+            const reviewPls = `${cc.join(", ")} please review ${mdLink(prUrl, `PR #${number}`)} when you have time, thank you`;
+            sendMultipartMessage(queue, room, reviewPls, 500);
+        }
         return true;
     }
     catch (error) {

@@ -1,6 +1,7 @@
 import type { PackagePublishedEvent, PullRequestOpenedEvent, PullRequestReviewRequestedEvent, PushEvent, Schema } from "@octokit/webhooks-types";
 import Room from "chatexchange/dist/Room";
 import type Queue from "p-queue";
+import { mdLink } from "../helpers.js";
 import { sendMultipartMessage } from "../utils/chat.js";
 
 /**
@@ -161,7 +162,7 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
     try {
         const {
             repository: { full_name, html_url: repoUrl },
-            pull_request: { html_url: prUrl, title, user, requested_reviewers },
+            pull_request: { html_url: prUrl, title, user, requested_reviewers, number },
             sender: { login: requesterName, html_url: requesterUrl, id: requesterId }
         } = payload;
 
@@ -171,23 +172,22 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
         const { GITHUB_TO_CHAT_USERS = "[]" } = process.env;
         const uidMap: Map<number, string> = new Map(JSON.parse(GITHUB_TO_CHAT_USERS));
 
+        const reviewerIds: Set<number> = new Set([requesterId]);
+
         const reviewers = requested_reviewers.map((reviewer) => {
             const { html_url, id } = reviewer;
+
+            reviewerIds.add(id);
 
             const isTeam = "name" in reviewer;
             const username = isTeam ? reviewer.name : reviewer.login;
             const teamPfx = isTeam ? `[team] ` : "";
 
-            const mention = uidMap.has(id) ? `@${uidMap.get(id)}` : `(${html_url})`;
-            return `- ${teamPfx}${username} ${mention}`;
+            return `${teamPfx}${username} (${html_url})`;
         });
 
-        const mention = uidMap.has(requesterId) ?
-            `@${uidMap.get(requesterId)}` :
-            `(${requesterUrl})`;
-
         const template = `
-${requesterName} ${mention}
+${requesterName} (${requesterUrl})
 requested review from:
 ${reviewers.join("\n")}
 ---------
@@ -198,6 +198,17 @@ Title:      ${title}
 Opened by ${login} (${userUrl})`;
 
         sendMultipartMessage(queue, room, template, 500);
+
+        const cc: string[] = [];
+        reviewerIds.forEach((id) => {
+            if (!uidMap.has(id)) return;
+            cc.push(`@${uidMap.get(id)}`);
+        });
+
+        if (cc.length) {
+            const reviewPls = `${cc.join(", ")} please review ${mdLink(prUrl, `PR #${number}`)} when you have time, thank you`;
+            sendMultipartMessage(queue, room, reviewPls, 500);
+        }
 
         return true;
 
