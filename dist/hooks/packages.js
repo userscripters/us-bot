@@ -91,21 +91,19 @@ export const handleReviewRequested = async (queue, room, payload) => {
             const username = isTeam ? reviewer.name : reviewer.login;
             const teamPfx = isTeam ? `[team] ` : "";
             const mention = uidMap.has(id) ? `@${uidMap.get(id)}` : `(${html_url})`;
-            return `-${teamPfx}${username} ${mention}`;
+            return `- ${teamPfx}${username} ${mention}`;
         });
         const mention = uidMap.has(requesterId) ?
             `@${uidMap.get(requesterId)}` :
             `(${requesterUrl})`;
         const template = `
-review request added
+${requesterName} ${mention}
+requested review from:
+${reviewers.join("\n")}
 ---------
 Repository: ${full_name} (${repoUrl})
 PR URL:     ${prUrl}
 Title:      ${title}
-
-${requesterName} ${mention}
-requested review from:
-${reviewers.join("\n")}
 ---------
 Opened by ${login} (${userUrl})`;
         sendMultipartMessage(queue, room, template, 500);
