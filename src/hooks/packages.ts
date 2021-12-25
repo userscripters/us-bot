@@ -162,7 +162,7 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
     try {
         const {
             repository: { full_name, html_url: repoUrl },
-            pull_request: { html_url: prUrl, title, user, requested_reviewers, number },
+            pull_request: { html_url: prUrl, title, user, number },
             sender: { login: requesterName, html_url: requesterUrl, id: requesterId }
         } = payload;
 
@@ -174,22 +174,22 @@ export const handleReviewRequested = async (queue: Queue, room: Room, payload: P
 
         const reviewerIds: Set<number> = new Set([requesterId]);
 
-        const reviewers = requested_reviewers.map((reviewer) => {
-            const { html_url, id } = reviewer;
+        const requested = "requested_reviewer" in payload ?
+            payload.requested_reviewer :
+            payload.requested_team;
 
-            reviewerIds.add(id);
+        const { html_url, id } = requested;
 
-            const isTeam = "name" in reviewer;
-            const username = isTeam ? reviewer.name : reviewer.login;
-            const teamPfx = isTeam ? `[team] ` : "";
+        reviewerIds.add(id);
 
-            return `${teamPfx}${username} (${html_url})`;
-        });
+        const isTeam = "name" in requested;
+        const username = isTeam ? requested.name : requested.login;
+        const teamPfx = isTeam ? `[team] ` : "";
 
         const template = `
 ${requesterName} (${requesterUrl})
 requested review from:
-${reviewers.join("\n")}
+${teamPfx}${username} (${html_url})
 ---------
 Repository: ${full_name} (${repoUrl})
 PR URL:     ${prUrl}
