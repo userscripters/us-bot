@@ -73,6 +73,8 @@ const { roomIds } = config;
 
 const bot = await client.getMe();
 
+console.debug(`logged in as: ${await bot.name}\n`);
+
 const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
     try {
         const room = await client.joinRoom(+id);
@@ -141,11 +143,7 @@ const roomJoins: Promise<JoinStatus>[] = roomIds.map(async (id) => {
 
             const response = await builder(config, text);
 
-            console.debug(`
-            From:     ${userId}
-            Name:     ${msg.userName}
-            Response: ${response}
-            `);
+            console.debug(`from: ${userId}, name: ${msg.userName}, admin: ${isAdmin}, res: "${response}"\n`);
 
             if (!response && !isAdmin) return;
 
