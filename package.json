@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "typecheck": "tsc --noEmit",
-        "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json node --loader ts-node/esm node_modules/mocha/lib/cli/cli test/**/*.spec.ts",
+        "test": "cross-env TS_NODE_PROJECT=test/tsconfig.json mocha",
         "build": "npm run typecheck && npm run test && tsc",
         "start:dev": "node --loader ts-node/esm src/index.ts",
         "update": "git checkout master && npm run build && git add dist && git commit --amend --no-edit",
