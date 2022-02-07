@@ -140,7 +140,7 @@ export const moveUserscriptIdea = async ({ org }: BotConfig, text: string) => {
 };
 
 /**
- * @summary adds a repository to organisation project
+ * @summary adds a repository to the organization project
  */
 export const addRepository = async ({ org }: BotConfig, text: string) => {
     const args = splitArgs(text);
@@ -151,20 +151,9 @@ export const addRepository = async ({ org }: BotConfig, text: string) => {
 
     const common = { private: p, name, description };
 
-    if (template) {
-        const res = await oktokit.rest.repos.createUsingTemplate({
-            ...common,
-            template_owner: org,
-            template_repo: template,
-            owner: org,
-        });
+    const res = await addRepositoryHandler(org, { ...common, template });
 
-        return sayCreatedRepo(res.data, true);
-    }
-
-    const res = await oktokit.rest.repos.createInOrg({ ...common, org });
-
-    return sayCreatedRepo(res.data);
+    return sayCreatedRepo(res, !!template);
 };
 
 /**
