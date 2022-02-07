@@ -1,5 +1,6 @@
 import { Command } from "commander";
 import { BotConfig } from "./config.js";
+import { addRepositoryHandler } from "./handlers.js";
 import { listify, mdLink, splitArgs } from "./helpers.js";
 import { sayCreatedRepo } from "./messages.js";
 import oktokit from "./userscripters.js";
@@ -10,6 +11,9 @@ addIdea
     .description("Logs a new idea for a userscript")
     .requiredOption("-c, --column <id>", "Column id")
     .requiredOption("-s, --summary <text>", "Idea summary")
+    .option("-i, --init <name>", "Initialize a repository")
+    .option("-t, --template <template>", "Project template")
+    .option("-p, --private", "Visibility")
     .option("-o, --repository <link>", "Repository if exists")
     .option("-r, --reference <link>", "Inspiration reference");
 
@@ -23,7 +27,7 @@ moveIdea
 const createRepo = new Command("create-repo");
 createRepo
     .description("Creates a [templated] GitHub repository")
-    .requiredOption("-n --name <name>", "Project name")
+    .requiredOption("-n, --name <name>", "Project name")
     .requiredOption("-d, --description <text>", "Project description")
     .option("-t, --template <template>", "Project template")
     .option("-p, --private", "Visibility");
@@ -59,21 +63,37 @@ export const listCommands = () => {
 
 /**
  * @summary adds an idea to the Userscripts project
+ * @param config {@link BotConfig} to use
+ * @param text command message content
  */
-export const addUserscriptIdea = async ({ org }: BotConfig, text: string) => {
+export const addUserscriptIdea = async (config: BotConfig, text: string) => {
+    const { org } = config;
+
     const args = splitArgs(text);
 
     const parsed = addIdea.parse(args, { from: "user" });
 
-    const { column, repository, reference, summary } = parsed.opts();
+    const { c, i, p, t, o, r, s } = parsed.opts();
 
-    const lines = [`**Idea**`, `${summary}`];
+    const lines = [`**Idea**`, `${s}`];
 
-    if (reference) lines.push(`\n**Reference**`, reference);
-    if (repository) lines.push(`\n**Repository**`, repository);
+    if (r) lines.push(`\n**Reference**`, r);
+
+    if (o && !i) lines.push(`\n**Repository**`, o);
+
+    if (i) {
+        const { html_url } = await addRepositoryHandler(org, {
+            description: s,
+            name: i,
+            private: p,
+            template: t
+        });
+
+        lines.push(`\n**Repository**`, html_url);
+    }
 
     const res = await oktokit.rest.projects.createCard({
-        column_id: column,
+        column_id: c,
         note: lines.join("\n"),
         mediaType: { previews: ["inertia"] },
     });
@@ -120,7 +140,7 @@ export const moveUserscriptIdea = async ({ org }: BotConfig, text: string) => {
 };
 
 /**
- * @summary adds a repository to organisation project
+ * @summary adds a repository to the organization project
  */
 export const addRepository = async ({ org }: BotConfig, text: string) => {
     const args = splitArgs(text);
@@ -131,20 +151,9 @@ export const addRepository = async ({ org }: BotConfig, text: string) => {
 
     const common = { private: p, name, description };
 
-    if (template) {
-        const res = await oktokit.rest.repos.createUsingTemplate({
-            ...common,
-            template_owner: org,
-            template_repo: template,
-            owner: org,
-        });
+    const res = await addRepositoryHandler(org, { ...common, template });
 
-        return sayCreatedRepo(res.data, true);
-    }
-
-    const res = await oktokit.rest.repos.createInOrg({ ...common, org });
-
-    return sayCreatedRepo(res.data);
+    return sayCreatedRepo(res, !!template);
 };
 
 /**
