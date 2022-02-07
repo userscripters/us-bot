@@ -73,27 +73,27 @@ export const addUserscriptIdea = async (config: BotConfig, text: string) => {
 
     const parsed = addIdea.parse(args, { from: "user" });
 
-    const { c, i, p, t, o, r, s } = parsed.opts();
+    const { column, init, private: p, template, repository, reference, summary } = parsed.opts();
 
-    const lines = [`**Idea**`, `${s}`];
+    const lines = [`**Idea**`, `${summary}`];
 
-    if (r) lines.push(`\n**Reference**`, r);
+    if (reference) lines.push(`\n**Reference**`, reference);
 
-    if (o && !i) lines.push(`\n**Repository**`, o);
+    if (repository && !init) lines.push(`\n**Repository**`, repository);
 
-    if (i) {
+    if (init) {
         const { html_url } = await addRepositoryHandler(org, {
-            description: s,
-            name: i,
+            description: summary,
+            name: init,
             private: p,
-            template: t
+            template: template
         });
 
         lines.push(`\n**Repository**`, html_url);
     }
 
     const res = await oktokit.rest.projects.createCard({
-        column_id: c,
+        column_id: column,
         note: lines.join("\n"),
         mediaType: { previews: ["inertia"] },
     });
