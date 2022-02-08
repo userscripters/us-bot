@@ -20,3 +20,9 @@ export const isIgnoredUser = (room: Room, user: number | User): boolean => {
  */
 export const isSameRoom = (room: number | Room, roomId: number) =>
     (typeof room === "number" ? room : room.id) === roomId;
+
+/**
+ * @summary checks if a given string is a numeric string
+ * @param str string to check
+ */
+export const isNumericString = (str: string) => !Number.isNaN(+str);
