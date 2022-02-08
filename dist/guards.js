@@ -5,3 +5,4 @@ export const isIgnoredUser = (room, user) => {
     return ignoredList.has(userId);
 };
 export const isSameRoom = (room, roomId) => (typeof room === "number" ? room : room.id) === roomId;
+export const isNumericString = (str) => !Number.isNaN(+str);

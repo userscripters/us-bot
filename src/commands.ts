@@ -1,9 +1,10 @@
 import { Command } from "commander";
 import { BotConfig } from "./config.js";
+import { isNumericString } from "./guards.js";
 import { addRepositoryHandler } from "./handlers.js";
 import { listify, mdLink, splitArgs } from "./helpers.js";
 import { sayCreatedRepo } from "./messages.js";
-import oktokit from "./userscripters.js";
+import oktokit, { getOrgColumns, getProjectColumns } from "./userscripters.js";
 import { safeMatch } from "./utils/regex.js";
 
 const addIdea = new Command("add-idea");
@@ -75,6 +76,9 @@ export const addUserscriptIdea = async (config: BotConfig, text: string) => {
 
     const { column, init, private: p, template, repository, reference, summary } = parsed.opts();
 
+    const columnId = isNumericString(column) ? +column : (await getOrgColumns(org)).get(column);
+    if (!columnId) return `Column "${column}" not found in the org`;
+
     const lines = [`**Idea**`, `${summary}`];
 
     if (reference) lines.push(`\n**Reference**`, reference);
@@ -93,7 +97,7 @@ export const addUserscriptIdea = async (config: BotConfig, text: string) => {
     }
 
     const res = await oktokit.rest.projects.createCard({
-        column_id: column,
+        column_id: columnId,
         note: lines.join("\n"),
         mediaType: { previews: ["inertia"] },
     });
@@ -110,21 +114,27 @@ export const addUserscriptIdea = async (config: BotConfig, text: string) => {
 
 /**
  * @summary moves an idea to another column
+ * @param config {@link BotConfig} to use
+ * @param text command message content
  */
 export const moveUserscriptIdea = async ({ org }: BotConfig, text: string) => {
     const args = splitArgs(text);
 
     const parsed = moveIdea.parse(args, { from: "user" });
+    const options = parsed.opts();
 
-    const { id, to, position = "top" } = parsed.opts();
+    const { id, to, position = "top" } = options;
+
+    const toId = isNumericString(to) ? +to : (await getOrgColumns(org)).get(to);
+    if (!toId) return `Destination column "${to}" not found`;
 
     const res = await oktokit.rest.projects.moveCard({
         card_id: +id,
         position,
-        column_id: +to,
+        column_id: toId,
     });
 
-    const cres = await oktokit.rest.projects.getColumn({ column_id: +to });
+    const cres = await oktokit.rest.projects.getColumn({ column_id: toId });
 
     const { project_url } = cres.data;
     const projectId = +project_url.replace(/\D+/, "");
@@ -190,11 +200,9 @@ export const listProjectColumns = async ({ org }: BotConfig, text: string) => {
 
     const { id, name } = project;
 
-    const colRes = await oktokit.rest.projects.listColumns({ project_id: id });
-
-    const columns = colRes.data;
+    const columns = await getProjectColumns(id);
 
     return `"${name}" columns:\n${columns
-        .map(({ id, name }) => `- ${id} | ${name}`)
+        .map((id, name) => `- ${id} | ${name}`)
         .join("\n")}`;
 };
