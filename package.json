@@ -50,7 +50,7 @@
         "express": "^4.21.2",
         "got": "^11.8.5",
         "html-entities": "^2.3.3",
-        "octokit": "^3.1.2",
+        "octokit": "^4.1.2",
         "p-queue": "^7.3.0"
     },
     "devDependencies": {
